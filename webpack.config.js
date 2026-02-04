@@ -145,12 +145,14 @@ var options = {
           to: path.join(__dirname, 'build'),
           force: true,
           transform: function (content, path) {
-            // generates the manifest file using the package.json informations
+            // Merge package.json fields only when manifest doesn't define them
+            var manifest = JSON.parse(content.toString());
             return Buffer.from(
               JSON.stringify({
-                description: process.env.npm_package_description,
-                version: process.env.npm_package_version,
-                ...JSON.parse(content.toString()),
+                ...manifest,
+                description:
+                  manifest.description || process.env.npm_package_description,
+                version: manifest.version || process.env.npm_package_version,
               })
             );
           },
@@ -169,16 +171,7 @@ var options = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: 'src/assets/img/icon-128.png',
-          to: path.join(__dirname, 'build'),
-          force: true,
-        },
-      ],
-    }),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: 'src/assets/img/icon-34.png',
+          from: 'src/assets/img',
           to: path.join(__dirname, 'build'),
           force: true,
         },
