@@ -197,7 +197,7 @@ const Panel: React.FC = () => {
         background: '#fafafa',
       }}
     >
-      {/* Header */}
+      {/* Header - commented out for now
       <div
         style={{
           padding: '12px 16px',
@@ -210,6 +210,7 @@ const Panel: React.FC = () => {
       >
         <img src={logo} alt="Read Between" style={{ height: '20px' }} />
       </div>
+      */}
 
       {/* Tab bar */}
       <div
