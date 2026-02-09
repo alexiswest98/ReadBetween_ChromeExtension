@@ -6,6 +6,7 @@ import ArticleBreakdown from './ArticleBreakdown';
 import FramingSignals from './FramingSignals';
 import SourcesSection from './SourcesSection';
 import AuthorTransparency from './AuthorTransparency';
+import SimilarCoverage from './SimilarCoverage';
 import ActionsBar from './ActionsBar';
 import Footer from './Footer';
 
@@ -85,6 +86,7 @@ const AnalysisView: React.FC<Props> = ({
           <AuthorTransparency
             author={analysisResult.author_transparency}
           />
+          <SimilarCoverage analysisResult={analysisResult} />
 
           {/* Notices / Warnings */}
           {analysisResult.meta.warnings.length > 0 && (

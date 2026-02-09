@@ -1,3 +1,4 @@
+require('dotenv').config();
 var webpack = require('webpack'),
   path = require('path'),
   fileSystem = require('fs-extra'),
@@ -137,7 +138,10 @@ var options = {
     new CleanWebpackPlugin({ verbose: false }),
     new webpack.ProgressPlugin(),
     // expose and write the allowed env vars on the compiled bundle
-    new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'development',
+      OPENAI_API_KEY: '',
+    }),
     new CopyWebpackPlugin({
       patterns: [
         {
