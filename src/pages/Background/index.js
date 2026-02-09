@@ -1,7 +1,5 @@
-console.log('This is the background page.');
-console.log('Put the background scripts here.');
+console.log('[Read Between] Background service worker loaded.');
 
-// Open side panel when extension icon is clicked
 chrome.action.onClicked.addListener((tab) => {
   chrome.sidePanel.open({ windowId: tab.windowId });
 });
