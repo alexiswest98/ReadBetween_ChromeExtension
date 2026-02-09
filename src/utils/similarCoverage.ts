@@ -34,11 +34,16 @@ function extractEntitiesFromAnalysis(analysis: AnalysisResult): string[] {
   const fullText = textParts.join(' ');
 
   const entityPattern = /(?:[A-Z][a-z]+ ){1,3}[A-Z][a-z]+/g;
-  const matches = fullText.match(entityPattern) || [];
+  const matches: string[] = fullText.match(entityPattern) || [];
 
   const sourceNames = analysis.sources.items.map((s) => s.source_name);
-  const all = [...matches, ...sourceNames];
-  const unique = [...new Set(all)];
+  const all: string[] = matches.concat(sourceNames);
+  const seen: Record<string, boolean> = {};
+  const unique = all.filter(function (item) {
+    if (seen[item]) return false;
+    seen[item] = true;
+    return true;
+  });
   return unique.slice(0, 8);
 }
 
@@ -111,7 +116,7 @@ Return exactly 3 results.
       format: {
         type: 'json_schema',
         json_schema: similarCoverageSchema,
-      },
+      } as any,
     },
   });
 
