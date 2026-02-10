@@ -2,28 +2,34 @@ import OpenAI from 'openai';
 import { SimilarCoverageItem, AnalysisResult } from '../types/models';
 
 const similarCoverageSchema = {
-  name: 'similar_coverage',
-  strict: true,
-  schema: {
-    type: 'object' as const,
-    properties: {
-      articles: {
-        type: 'array' as const,
-        items: {
-          type: 'object' as const,
-          properties: {
-            publisher: { type: 'string' as const },
-            headline: { type: 'string' as const },
-            url: { type: 'string' as const },
+  type: 'object' as const,
+  properties: {
+    articles: {
+      type: 'array' as const,
+      items: {
+        type: 'object' as const,
+        properties: {
+          publisher: {
+            type: 'string' as const,
+            description: 'The name of the news publisher',
           },
-          required: ['publisher', 'headline', 'url'] as const,
-          additionalProperties: false,
+          headline: {
+            type: 'string' as const,
+            description: 'The exact headline as it appears on the page',
+          },
+          url: {
+            type: 'string' as const,
+            description:
+              'The exact URL copied from the web search result. Must be a real, working link.',
+          },
         },
+        required: ['publisher', 'headline', 'url'] as const,
+        additionalProperties: false,
       },
     },
-    required: ['articles'] as const,
-    additionalProperties: false,
   },
+  required: ['articles'] as const,
+  additionalProperties: false,
 };
 
 function extractEntitiesFromAnalysis(analysis: AnalysisResult): string[] {
@@ -77,18 +83,24 @@ export async function fetchSimilarCoverage(
   const response = await client.responses.create({
     model: 'gpt-4.1',
     tools: [{ type: 'web_search' }],
-    reasoning: { effort: 'medium' },
+    tool_choice: { type: 'web_search' } as any,
     instructions: `
 You are helping populate "Find Similar Coverage" for a news-analysis product.
 
 Goal:
 Find 3 news articles from 3 different publishers that report on the same underlying event/topic as the input article.
 
-Rules:
-- Publishers must be different (no duplicates, no syndication reposts).
-- Prefer straight reporting over opinion/aggregations.
-- Each result must clearly match the same event/topic.
-- Return only the structured JSON specified by the schema.
+CRITICAL RULES FOR URLs:
+- Every URL you return MUST be copied exactly from your web search results.
+- DO NOT fabricate, guess, or reconstruct URLs. Only use URLs you actually found via search.
+- If you cannot find 3 real articles with real URLs, return fewer rather than inventing URLs.
+
+Other rules:
+- Publishers must be different from each other and from the input publisher.
+- No syndication reposts (same article on different domains).
+- Prefer straight news reporting over opinion pieces or aggregators.
+- Each result must cover the same event/topic as the input article.
+- Use the exact headline as it appears on the publisher's page.
 `.trim(),
     input: [
       {
@@ -105,8 +117,8 @@ Input article:
 - Event summary (1-2 sentences): ${eventSummary}
 
 Task:
-Use web search to find 3 other publishers reporting on this same event/topic.
-Return exactly 3 results.
+Search the web for 3 other publishers reporting on this same event/topic.
+Return only articles you found via search with their exact URLs.
             `.trim(),
           },
         ],
@@ -115,11 +127,47 @@ Return exactly 3 results.
     text: {
       format: {
         type: 'json_schema',
-        json_schema: similarCoverageSchema,
+        name: 'similar_coverage',
+        strict: true,
+        schema: similarCoverageSchema,
       } as any,
     },
   });
 
+  // Also extract URLs from web search annotations as a fallback/verification
+  const annotationUrls: Record<string, string> = {};
+  for (const item of response.output) {
+    if (item.type === 'message' && 'content' in item) {
+      for (const block of item.content) {
+        if ('annotations' in block) {
+          for (const ann of (block as any).annotations || []) {
+            if (ann.type === 'url_citation' && ann.url && ann.title) {
+              annotationUrls[ann.title.toLowerCase()] = ann.url;
+            }
+          }
+        }
+      }
+    }
+  }
+
   const parsed = JSON.parse(response.output_text);
-  return parsed.articles as SimilarCoverageItem[];
+  const articles = parsed.articles as SimilarCoverageItem[];
+
+  // Cross-reference: if an annotation URL matches a headline, prefer the annotation URL
+  return articles.map(function (article) {
+    const headlineLower = article.headline.toLowerCase();
+    for (var key in annotationUrls) {
+      if (
+        headlineLower.indexOf(key) !== -1 ||
+        key.indexOf(headlineLower) !== -1
+      ) {
+        return {
+          publisher: article.publisher,
+          headline: article.headline,
+          url: annotationUrls[key],
+        };
+      }
+    }
+    return article;
+  });
 }
