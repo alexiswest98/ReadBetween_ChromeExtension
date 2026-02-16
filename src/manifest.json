@@ -2,7 +2,6 @@
   "manifest_version": 3,
   "name": "Read Between",
   "description": "AI-powered news literacy tool that helps you read between the lines.",
-  "options_page": "options.html",
   "background": {
     "service_worker": "background.bundle.js"
   },
