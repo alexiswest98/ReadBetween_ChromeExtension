@@ -2,14 +2,12 @@
   "manifest_version": 3,
   "name": "Read Between",
   "description": "AI-powered news literacy tool that helps you read between the lines.",
+  "version": "1.0.0",
   "background": {
     "service_worker": "background.bundle.js"
   },
   "action": {
     "default_icon": "ReadBetweenFavicon_White.png"
-  },
-  "chrome_url_overrides": {
-    "newtab": "newtab.html"
   },
   "icons": {
     "128": "ReadBetweenFavicon_White.png"

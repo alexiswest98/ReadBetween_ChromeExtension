@@ -41,12 +41,6 @@ const AnalysisView: React.FC<Props> = ({
 }) => {
   return (
     <div className="analysis-view">
-      <SystemStatus
-        articleDetected={articleDetected}
-        accessState={accessState}
-        loading={loading}
-        error={error}
-      />
 
       {!analysisResult && !loading && (
         <div className="analysis-empty">
