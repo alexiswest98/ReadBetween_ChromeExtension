@@ -35,7 +35,7 @@ const AuthorTransparency: React.FC<Props> = ({ author }) => {
             </a>
           </p>
         )}
-        {author.previous_articles.length > 0 ? (
+        {/* {author.previous_articles.length > 0 ? (
           <div className="author-other-articles">
             <strong className="author-other-label">Other Articles:</strong>
             {author.previous_articles.map((a, i) => (
@@ -57,7 +57,7 @@ const AuthorTransparency: React.FC<Props> = ({ author }) => {
           <p className="author-no-articles">
             Previous articles not available from publisher page.
           </p>
-        )}
+        )} */}
       </div>
     </div>
   );
