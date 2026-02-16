@@ -15,8 +15,8 @@ import {
   removeArticle,
   generateId,
 } from '../../utils/storage';
-import AnalysisView from './components/AnalysisView';
-import SavedArticlesView from './components/SavedArticlesView';
+import AnalysisView from './components/AnalysisView/AnalysisView';
+import SavedArticlesView from './components/SavedArticlesView/SavedArticlesView';
 import './Panel.css';
 import logo from '../../assets/img/ReadBetweenLogo_White.png';
 
@@ -187,72 +187,24 @@ const Panel: React.FC = () => {
   const isCurrentSaved = savedArticles.some((a) => a.url === currentUrl);
 
   return (
-    <div
-      style={{
-        fontFamily:
-          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        fontSize: '13px',
-        color: '#1a1a1a',
-        minHeight: '100vh',
-        background: '#fafafa',
-      }}
-    >
+    <div className="panel-root">
       {/* Header - commented out for now
-      <div
-        style={{
-          padding: '12px 16px',
-          borderBottom: '1px solid #e0e0e0',
-          background: '#1a1a1a',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }}
-      >
-        <img src={logo} alt="Read Between" style={{ height: '20px' }} />
+      <div className="panel-header">
+        <img src={logo} alt="Read Between" />
       </div>
       */}
 
       {/* Tab bar */}
-      <div
-        style={{
-          display: 'flex',
-          borderBottom: '1px solid #e0e0e0',
-          background: '#fff',
-        }}
-      >
+      <div className="tab-bar">
         <button
           onClick={() => setView('analysis')}
-          style={{
-            flex: 1,
-            padding: '10px',
-            border: 'none',
-            cursor: 'pointer',
-            background: view === 'analysis' ? '#fff' : '#f5f5f5',
-            borderBottom:
-              view === 'analysis'
-                ? '2px solid #1a1a1a'
-                : '2px solid transparent',
-            fontWeight: view === 'analysis' ? 600 : 400,
-            fontSize: '13px',
-          }}
+          className={`tab-button${view === 'analysis' ? ' active' : ''}`}
         >
           Analysis
         </button>
         <button
           onClick={() => setView('saved')}
-          style={{
-            flex: 1,
-            padding: '10px',
-            border: 'none',
-            cursor: 'pointer',
-            background: view === 'saved' ? '#fff' : '#f5f5f5',
-            borderBottom:
-              view === 'saved'
-                ? '2px solid #1a1a1a'
-                : '2px solid transparent',
-            fontWeight: view === 'saved' ? 600 : 400,
-            fontSize: '13px',
-          }}
+          className={`tab-button${view === 'saved' ? ' active' : ''}`}
         >
           Saved ({savedArticles.length})
         </button>

@@ -1,0 +1,20 @@
+.actions-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.action-button {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  color: #333;
+}
+
+.action-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

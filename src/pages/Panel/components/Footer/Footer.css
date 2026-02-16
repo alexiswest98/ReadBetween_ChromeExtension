@@ -1,0 +1,16 @@
+.footer {
+  padding: 16px 0;
+  border-top: 1px solid #eee;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #aaa;
+  text-align: center;
+}
+
+.footer p:first-child {
+  margin: 0 0 4px;
+}
+
+.footer p:last-child {
+  margin: 0;
+}

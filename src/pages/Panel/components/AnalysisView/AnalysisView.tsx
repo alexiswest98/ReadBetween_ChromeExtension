@@ -1,14 +1,15 @@
 import React from 'react';
-import { AnalysisResult, AccessStateResult } from '../../../types/models';
-import SystemStatus from './SystemStatus';
-import ArticleContext from './ArticleContext';
-import ArticleBreakdown from './ArticleBreakdown';
-import FramingSignals from './FramingSignals';
-import SourcesSection from './SourcesSection';
-import AuthorTransparency from './AuthorTransparency';
-import SimilarCoverage from './SimilarCoverage';
-import ActionsBar from './ActionsBar';
-import Footer from './Footer';
+import { AnalysisResult, AccessStateResult } from '../../../../types/models';
+import SystemStatus from '../SystemStatus/SystemStatus';
+import ArticleContext from '../ArticleContext/ArticleContext';
+import ArticleBreakdown from '../ArticleBreakdown/ArticleBreakdown';
+import FramingSignals from '../FramingSignals/FramingSignals';
+import SourcesSection from '../SourcesSection/SourcesSection';
+import AuthorTransparency from '../AuthorTransparency/AuthorTransparency';
+import SimilarCoverage from '../SimilarCoverage/SimilarCoverage';
+import ActionsBar from '../ActionsBar/ActionsBar';
+import Footer from '../Footer/Footer';
+import './AnalysisView.css';
 
 interface Props {
   analysisResult: AnalysisResult | null;
@@ -38,7 +39,7 @@ const AnalysisView: React.FC<Props> = ({
   onOpenArticle,
 }) => {
   return (
-    <div style={{ padding: '12px 16px' }}>
+    <div className="analysis-view">
       <SystemStatus
         articleDetected={articleDetected}
         accessState={accessState}
@@ -47,25 +48,19 @@ const AnalysisView: React.FC<Props> = ({
       />
 
       {!analysisResult && !loading && (
-        <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-          <p style={{ color: '#666', marginBottom: '16px' }}>
+        <div className="analysis-empty">
+          <p>
             Navigate to a news article and click &ldquo;Analyze&rdquo; to
             extract and analyze its content.
           </p>
-          <button onClick={onAnalyze} style={primaryButtonStyle}>
+          <button onClick={onAnalyze} className="primary-button">
             Analyze Article
           </button>
         </div>
       )}
 
       {loading && (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '32px 16px',
-            color: '#666',
-          }}
-        >
+        <div className="analysis-loading">
           Analyzing article...
         </div>
       )}
@@ -90,17 +85,10 @@ const AnalysisView: React.FC<Props> = ({
 
           {/* Notices / Warnings */}
           {analysisResult.meta.warnings.length > 0 && (
-            <div style={cardStyle}>
-              <h3 style={sectionTitleStyle}>Notices</h3>
+            <div className="card">
+              <h3 className="section-title">Notices</h3>
               {analysisResult.meta.warnings.map((w, i) => (
-                <p
-                  key={i}
-                  style={{
-                    color: '#888',
-                    fontSize: '12px',
-                    margin: '4px 0',
-                  }}
-                >
+                <p key={i} className="notice-text">
                   {w}
                 </p>
               ))}
@@ -119,33 +107,6 @@ const AnalysisView: React.FC<Props> = ({
       )}
     </div>
   );
-};
-
-const primaryButtonStyle: React.CSSProperties = {
-  padding: '10px 24px',
-  background: '#1a1a1a',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '6px',
-  cursor: 'pointer',
-  fontSize: '13px',
-  fontWeight: 500,
-};
-
-const cardStyle: React.CSSProperties = {
-  marginBottom: '12px',
-  padding: '12px',
-  background: '#fff',
-  borderRadius: '6px',
-  border: '1px solid #e8e8e8',
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  margin: '0 0 8px',
-  fontSize: '11px',
-  textTransform: 'uppercase',
-  letterSpacing: '0.5px',
-  color: '#999',
 };
 
 export default AnalysisView;

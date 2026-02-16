@@ -1,0 +1,10 @@
+.breakdown-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.breakdown-item {
+  margin-bottom: 6px;
+  line-height: 1.5;
+  color: #333;
+}

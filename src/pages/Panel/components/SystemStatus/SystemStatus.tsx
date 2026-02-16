@@ -1,5 +1,6 @@
 import React from 'react';
-import { AccessStateResult } from '../../../types/models';
+import { AccessStateResult } from '../../../../types/models';
+import './SystemStatus.css';
 
 interface Props {
   articleDetected: boolean;
@@ -37,42 +38,17 @@ const SystemStatus: React.FC<Props> = ({
     : 'No article analyzed';
 
   return (
-    <div
-      style={{
-        marginBottom: '12px',
-        padding: '10px 12px',
-        background: '#fff',
-        borderRadius: '6px',
-        border: '1px solid #e8e8e8',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          fontSize: '12px',
-        }}
-      >
+    <div className="status-container">
+      <div className="status-row">
         <span
-          style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: dotColor,
-            display: 'inline-block',
-            flexShrink: 0,
-          }}
+          className="status-dot"
+          style={{ background: dotColor }}
         />
-        <span style={{ color: '#555' }}>{statusText}</span>
+        <span className="status-text">{statusText}</span>
         {accessState && !loading && (
           <span
+            className="status-badge"
             style={{
-              marginLeft: 'auto',
-              padding: '2px 8px',
-              borderRadius: '10px',
-              fontSize: '11px',
-              fontWeight: 500,
               background:
                 accessLabels[accessState.state].color + '15',
               color: accessLabels[accessState.state].color,
@@ -82,17 +58,7 @@ const SystemStatus: React.FC<Props> = ({
           </span>
         )}
       </div>
-      {error && (
-        <p
-          style={{
-            margin: '8px 0 0',
-            color: '#c0392b',
-            fontSize: '12px',
-          }}
-        >
-          {error}
-        </p>
-      )}
+      {error && <p className="status-error">{error}</p>}
     </div>
   );
 };
