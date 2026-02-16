@@ -48,7 +48,7 @@ button:active {
 
 /* Panel root */
 .panel-root {
-  font-size: 13px;
+  /* font-size: 13px; */
   color: #e0e0e0;
   min-height: 100vh;
   background: #111;
@@ -71,8 +71,8 @@ button:active {
   cursor: pointer;
   background: transparent;
   border-bottom: none;
-  font-weight: 400;
-  font-size: 13px;
+  /* font-weight: 400; */
+  /* font-size: 13px; */
   color: #aaa;
   border-radius: 20px;
   transition: background 0.2s, color 0.2s;
@@ -85,8 +85,9 @@ button:active {
 .tab-button.active {
   background: #2a2a2a;
   border-bottom: none;
-  font-weight: 600;
+  /* font-weight: 600; */
   color: #fff;
+  box-shadow: 0 1px 5px rgba(255, 255, 255, 0.4);
 }
 
 /* Shared component styles */
@@ -100,7 +101,7 @@ button:active {
 
 .section-title {
   margin: 0 0 8px;
-  font-size: 11px;
+  /* font-size: 11px; */
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #777;
@@ -108,7 +109,7 @@ button:active {
 
 .subtitle {
   margin: 0 0 6px;
-  font-size: 12px;
-  font-weight: 600;
+  /* font-size: 12px; */
+  /* font-weight: 600; */
   color: #bbb;
 }
