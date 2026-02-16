@@ -4,15 +4,15 @@
 }
 
 .similar-search-text {
-  color: #888;
+  color: #777;
   font-size: 12px;
   margin-bottom: 10px;
 }
 
 .search-button {
   padding: 8px 16px;
-  background: #1a1a1a;
-  color: #fff;
+  background: #f5f0e6;
+  color: #1a1a1a;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -23,15 +23,15 @@
 .similar-loading {
   text-align: center;
   padding: 16px 0;
-  color: #666;
+  color: #888;
   font-size: 12px;
 }
 
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid #e0e0e0;
-  border-top-color: #333;
+  border: 2px solid #333;
+  border-top-color: #ccc;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto 8px;
@@ -42,23 +42,23 @@
 }
 
 .similar-error-text {
-  color: #c0392b;
+  color: #e74c3c;
   font-size: 12px;
   margin: 0 0 8px;
 }
 
 .retry-button {
   padding: 4px 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #333;
   border-radius: 4px;
-  background: #fff;
+  background: #1e1e1e;
   cursor: pointer;
   font-size: 11px;
-  color: #333;
+  color: #ccc;
 }
 
 .similar-none {
-  color: #888;
+  color: #777;
   font-size: 12px;
   font-style: italic;
 }
@@ -66,11 +66,11 @@
 .similar-article {
   margin-bottom: 10px;
   padding-left: 10px;
-  border-left: 3px solid #e0e0e0;
+  border-left: 3px solid #333;
 }
 
 .similar-article-link {
-  color: #2563eb;
+  color: #5b9bd5;
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
@@ -80,16 +80,16 @@
 
 .similar-article-publisher {
   font-size: 11px;
-  color: #888;
+  color: #777;
 }
 
 .search-again-button {
   padding: 4px 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #333;
   border-radius: 4px;
-  background: #fff;
+  background: #1e1e1e;
   cursor: pointer;
   font-size: 11px;
-  color: #333;
+  color: #ccc;
   margin-top: 4px;
 }

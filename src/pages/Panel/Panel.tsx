@@ -197,16 +197,16 @@ const Panel: React.FC = () => {
       {/* Tab bar */}
       <div className="tab-bar">
         <button
-          onClick={() => setView('analysis')}
-          className={`tab-button${view === 'analysis' ? ' active' : ''}`}
-        >
-          Analysis
-        </button>
-        <button
           onClick={() => setView('saved')}
           className={`tab-button${view === 'saved' ? ' active' : ''}`}
         >
-          Saved ({savedArticles.length})
+          Saved
+        </button>
+        <button
+          onClick={() => setView('analysis')}
+          className={`tab-button${view === 'analysis' ? ' active' : ''}`}
+        >
+          Primary
         </button>
       </div>
 

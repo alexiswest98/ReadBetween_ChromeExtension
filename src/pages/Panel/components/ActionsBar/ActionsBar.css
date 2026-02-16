@@ -6,12 +6,12 @@
 
 .action-button {
   padding: 8px 14px;
-  border: 1px solid #ddd;
+  border: 1px solid #333;
   border-radius: 4px;
-  background: #fff;
+  background: #1e1e1e;
   cursor: pointer;
   font-size: 12px;
-  color: #333;
+  color: #ccc;
 }
 
 .action-button:disabled {

@@ -9,6 +9,7 @@ import AuthorTransparency from '../AuthorTransparency/AuthorTransparency';
 import SimilarCoverage from '../SimilarCoverage/SimilarCoverage';
 import ActionsBar from '../ActionsBar/ActionsBar';
 import Footer from '../Footer/Footer';
+import logo from '../../../../assets/img/ReadBetweenLogo_White.png';
 import './AnalysisView.css';
 
 interface Props {
@@ -49,9 +50,19 @@ const AnalysisView: React.FC<Props> = ({
 
       {!analysisResult && !loading && (
         <div className="analysis-empty">
-          <p>
-            Navigate to a news article and click &ldquo;Analyze&rdquo; to
-            extract and analyze its content.
+          <img src={logo} alt="Read Between" className="analysis-logo" />
+          <p className="analysis-tagline">
+            Read Between summarizes articles and highlights how news is
+            framed, not whether it&rsquo;s true or false.
+          </p>
+          <p className="analysis-description">
+            Analyze an article to see a neutral summary, key quotes,
+            framing signals that show how information is emphasized and
+            presented, author context, and related coverage from other
+            publishers.
+          </p>
+          <p className="analysis-save-hint">
+            Save articles to revisit later.
           </p>
           <button onClick={onAnalyze} className="primary-button">
             Analyze Article

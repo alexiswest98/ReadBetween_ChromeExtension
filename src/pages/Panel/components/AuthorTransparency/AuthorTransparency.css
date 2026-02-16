@@ -1,5 +1,6 @@
 .author-info {
   font-size: 13px;
+  color: #ccc;
 }
 
 .author-info p {
@@ -7,7 +8,7 @@
 }
 
 .author-link {
-  color: #2563eb;
+  color: #5b9bd5;
   text-decoration: none;
 }
 
@@ -24,14 +25,14 @@
 }
 
 .author-article-link {
-  color: #2563eb;
+  color: #5b9bd5;
   text-decoration: none;
   font-size: 12px;
 }
 
 .author-no-articles {
   margin: 8px 0 0;
-  color: #888;
+  color: #666;
   font-size: 12px;
   font-style: italic;
 }
