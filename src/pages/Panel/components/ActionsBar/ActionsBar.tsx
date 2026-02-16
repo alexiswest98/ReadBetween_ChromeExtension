@@ -20,9 +20,9 @@ const ActionsBar: React.FC<Props> = ({
     <div className="card">
       <h3 className="section-title">Actions</h3>
       <div className="actions-buttons">
-        <button onClick={onOpenArticle} className="action-button">
+        {/* <button onClick={onOpenArticle} className="action-button">
           Read Full Article
-        </button>
+        </button> */}
         <button onClick={onRefresh} className="action-button">
           Refresh Analysis
         </button>
