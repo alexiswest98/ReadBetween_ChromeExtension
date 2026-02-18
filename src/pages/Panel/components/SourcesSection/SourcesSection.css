@@ -1,13 +1,18 @@
+#sources-card {
+  background-color: #8CCA82;
+}
+
+
 .sources-empty {
   color: #777;
-  font-size: 12px;
+  /* font-size: 12px; */
   font-style: italic;
 }
 
 .source-item {
   margin-bottom: 10px;
   padding-left: 10px;
-  border-left: 3px solid #333;
+  border-left: 3px solid #1E1E1E;
 }
 
 .source-header {
@@ -19,21 +24,22 @@
 
 .source-name {
   font-weight: 500;
-  font-size: 13px;
-  color: #ccc;
+  /* font-size: 13px; */
+  color: #000000;
 }
 
 .source-type {
-  font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 8px;
-  background: #252525;
-  color: #888;
+  font-size: 0.5rem;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: rgb(26, 26, 26, 0.7);
+  box-shadow: 0 1px 5px rgba(255, 255, 255, .4);
+  color: #ffff;
 }
 
 .source-quote {
   margin: 2px 0;
-  font-size: 12px;
-  color: #777;
+  font-size: 0.7rem;
+  color: #1E1E1E;
   font-style: italic;
 }

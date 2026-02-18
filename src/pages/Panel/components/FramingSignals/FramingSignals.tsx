@@ -17,7 +17,7 @@ export const MissingContextCard: React.FC<MissingContextProps> = ({ missingConte
     .filter((s) => s.trim().length > 0);
 
   return (
-    <div className="card">
+    <div id="missing-card" className="card">
       <h3 className="section-title">What's Not Included</h3>
       <ul className="pattern-bullet-list">
         {sentences.map((sentence, i) => (
@@ -28,7 +28,7 @@ export const MissingContextCard: React.FC<MissingContextProps> = ({ missingConte
         <div className="pattern-quotes">
           {missingContext.evidence_quotes.map((quote, i) => (
             <p key={i} className="signal-quote">
-              &ldquo;{quote}&rdquo;
+              {quote}
             </p>
           ))}
         </div>

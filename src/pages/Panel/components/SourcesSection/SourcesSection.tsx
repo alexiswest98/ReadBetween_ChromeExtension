@@ -16,7 +16,7 @@ const typeLabels: Record<string, string> = {
 
 const SourcesSection: React.FC<Props> = ({ sources }) => {
   return (
-    <div className="card">
+    <div  id='sources-card' className="card">
       <h3 className="section-title">Sources & Attribution</h3>
       {sources.items.length === 0 ? (
         <p className="sources-empty">
