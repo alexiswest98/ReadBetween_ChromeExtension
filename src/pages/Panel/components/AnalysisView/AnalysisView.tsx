@@ -3,8 +3,8 @@ import { AnalysisResult, AccessStateResult } from '../../../../types/models';
 import SystemStatus from '../SystemStatus/SystemStatus';
 import ArticleContext from '../ArticleContext/ArticleContext';
 import ArticleBreakdown from '../ArticleBreakdown/ArticleBreakdown';
-import FramingSignals from '../FramingSignals/FramingSignals';
 import SourcesSection from '../SourcesSection/SourcesSection';
+import { MissingContextCard, NarrativeStructureCard, ToneIndicatorsCard } from '../FramingSignals/FramingSignals';
 import AuthorTransparency from '../AuthorTransparency/AuthorTransparency';
 import SimilarCoverage from '../SimilarCoverage/SimilarCoverage';
 import ActionsBar from '../ActionsBar/ActionsBar';
@@ -78,11 +78,16 @@ const AnalysisView: React.FC<Props> = ({
           <ArticleBreakdown
             breakdown={analysisResult.structured_breakdown}
           />
-          <FramingSignals
-            structuralPatterns={analysisResult.structural_patterns}
+          <SourcesSection sources={analysisResult.sources} />
+          <MissingContextCard
+            missingContext={analysisResult.structural_patterns.missing_context}
+          />
+          <NarrativeStructureCard
+            narrativeStructure={analysisResult.structural_patterns.narrative_structure}
+          />
+          <ToneIndicatorsCard
             languageAnalysis={analysisResult.language_analysis}
           />
-          <SourcesSection sources={analysisResult.sources} />
           <AuthorTransparency
             author={analysisResult.author_transparency}
           />

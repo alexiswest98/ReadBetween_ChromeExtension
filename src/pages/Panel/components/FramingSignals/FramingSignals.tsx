@@ -1,14 +1,75 @@
 import React from 'react';
 import {
-  StructuralPatterns,
+  StructuralPatternSection,
   LanguageAnalysis,
 } from '../../../../types/models';
 import './FramingSignals.css';
 
-interface Props {
-  structuralPatterns: StructuralPatterns;
-  languageAnalysis: LanguageAnalysis;
+// ========== What's Not Included (Missing Context) ==========
+
+interface MissingContextProps {
+  missingContext: StructuralPatternSection;
 }
+
+export const MissingContextCard: React.FC<MissingContextProps> = ({ missingContext }) => {
+  const sentences = missingContext.summary
+    .split(/(?<=\.)\s+/)
+    .filter((s) => s.trim().length > 0);
+
+  return (
+    <div className="card">
+      <h3 className="section-title">What's Not Included</h3>
+      <ul className="pattern-bullet-list">
+        {sentences.map((sentence, i) => (
+          <li key={i} className="pattern-bullet-item">{sentence}</li>
+        ))}
+      </ul>
+      {missingContext.evidence_quotes.length > 0 && (
+        <div className="pattern-quotes">
+          {missingContext.evidence_quotes.map((quote, i) => (
+            <p key={i} className="signal-quote">
+              &ldquo;{quote}&rdquo;
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ========== How the Story Is Structured (Narrative Structure) ==========
+
+interface NarrativeStructureProps {
+  narrativeStructure: StructuralPatternSection;
+}
+
+export const NarrativeStructureCard: React.FC<NarrativeStructureProps> = ({ narrativeStructure }) => {
+  const sentences = narrativeStructure.summary
+    .split(/(?<=\.)\s+/)
+    .filter((s) => s.trim().length > 0);
+
+  return (
+    <div className="card">
+      <h3 className="section-title">How the Story Is Structured</h3>
+      <ul className="pattern-bullet-list">
+        {sentences.map((sentence, i) => (
+          <li key={i} className="pattern-bullet-item">{sentence}</li>
+        ))}
+      </ul>
+      {narrativeStructure.evidence_quotes.length > 0 && (
+        <div className="pattern-quotes">
+          {narrativeStructure.evidence_quotes.map((quote, i) => (
+            <p key={i} className="signal-quote">
+              &ldquo;{quote}&rdquo;
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ========== Tone Indicators (Language Analysis) ==========
 
 const LanguageStat: React.FC<{ label: string; count: number; words: string[] }> = ({
   label,
@@ -28,77 +89,40 @@ const LanguageStat: React.FC<{ label: string; count: number; words: string[] }> 
   </div>
 );
 
-const FramingSignals: React.FC<Props> = ({ structuralPatterns, languageAnalysis }) => {
+interface ToneIndicatorsProps {
+  languageAnalysis: LanguageAnalysis;
+}
+
+export const ToneIndicatorsCard: React.FC<ToneIndicatorsProps> = ({ languageAnalysis }) => {
   return (
     <div className="card">
-      <h3 className="section-title">Structural Patterns</h3>
+      <h3 className="section-title">Tone Indicators</h3>
 
-      {/* Narrative Structure */}
-      <div className="pattern-section">
-        <h4 className="subtitle">Narrative Structure</h4>
-        <p className="pattern-summary">{structuralPatterns.narrative_structure.summary}</p>
-        {structuralPatterns.narrative_structure.evidence_quotes.length > 0 && (
-          <div className="pattern-quotes">
-            {structuralPatterns.narrative_structure.evidence_quotes.map((quote, i) => (
-              <p key={i} className="signal-quote">
-                &ldquo;{quote}&rdquo;
-              </p>
-            ))}
-          </div>
-        )}
-      </div>
+      {languageAnalysis.notable_choices.length > 0 && (
+        <ul className="pattern-bullet-list">
+          {languageAnalysis.notable_choices.map((choice, i) => (
+            <li key={i} className="pattern-bullet-item">{choice}</li>
+          ))}
+        </ul>
+      )}
 
-      {/* Missing Context */}
-      <div className="pattern-section">
-        <h4 className="subtitle">Missing Context</h4>
-        <p className="pattern-summary">{structuralPatterns.missing_context.summary}</p>
-        {structuralPatterns.missing_context.evidence_quotes.length > 0 && (
-          <div className="pattern-quotes">
-            {structuralPatterns.missing_context.evidence_quotes.map((quote, i) => (
-              <p key={i} className="signal-quote">
-                &ldquo;{quote}&rdquo;
-              </p>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Language Analysis */}
-      <div className="language-section">
-        <h3 className="section-title">Language Analysis</h3>
-
-        {/* Notable language choices */}
-        {languageAnalysis.notable_choices.length > 0 && (
-          <div className="framing-notable">
-            {languageAnalysis.notable_choices.map((choice, i) => (
-              <p key={i} className="framing-notable-choice">
-                {choice}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {/* Language category counts + words */}
-        <div className="language-stats-grid">
-          <LanguageStat
-            label="Emotional"
-            count={languageAnalysis.emotional_emphasis.count}
-            words={languageAnalysis.emotional_emphasis.words}
-          />
-          <LanguageStat
-            label="Moral"
-            count={languageAnalysis.moral_framing.count}
-            words={languageAnalysis.moral_framing.words}
-          />
-          <LanguageStat
-            label="Certainty"
-            count={languageAnalysis.certainty_language.count}
-            words={languageAnalysis.certainty_language.words}
-          />
-        </div>
+      <div className="language-stats-grid">
+        <LanguageStat
+          label="Emotional"
+          count={languageAnalysis.emotional_emphasis.count}
+          words={languageAnalysis.emotional_emphasis.words}
+        />
+        <LanguageStat
+          label="Moral"
+          count={languageAnalysis.moral_framing.count}
+          words={languageAnalysis.moral_framing.words}
+        />
+        <LanguageStat
+          label="Certainty"
+          count={languageAnalysis.certainty_language.count}
+          words={languageAnalysis.certainty_language.words}
+        />
       </div>
     </div>
   );
 };
-
-export default FramingSignals;

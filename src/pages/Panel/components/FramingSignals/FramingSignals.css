@@ -1,17 +1,17 @@
-/* Pattern sections (narrative structure, missing context) */
-.pattern-section {
-  margin-bottom: 12px;
-  padding-left: 10px;
-  border-left: 3px solid #333;
+/* Bullet list for summary sentences */
+.pattern-bullet-list {
+  margin: 0;
+  padding-left: 20px;
 }
 
-.pattern-summary {
-  margin: 2px 0;
+.pattern-bullet-item {
+  margin-bottom: 6px;
   font-size: 12px;
   color: #ccc;
   line-height: 1.5;
 }
 
+/* Evidence quotes (grey, italic) */
 .pattern-quotes {
   margin-top: 4px;
 }
@@ -23,28 +23,12 @@
   font-style: italic;
 }
 
-/* Language analysis section */
-.language-section {
-  border-top: 1px solid #2a2a2a;
-  padding-top: 12px;
-  margin-top: 8px;
-}
-
-.framing-notable {
-  margin-bottom: 12px;
-}
-
-.framing-notable-choice {
-  margin: 2px 0;
-  font-size: 12px;
-  color: #aaa;
-}
-
+/* Language stats grid */
 .language-stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-top: 12px;
 }
 
 .language-stat {

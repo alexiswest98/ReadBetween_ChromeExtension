@@ -17,7 +17,7 @@ const typeLabels: Record<string, string> = {
 const SourcesSection: React.FC<Props> = ({ sources }) => {
   return (
     <div className="card">
-      <h3 className="section-title">Sources</h3>
+      <h3 className="section-title">Sources & Attribution</h3>
       {sources.items.length === 0 ? (
         <p className="sources-empty">
           No explicitly attributed sources were identified in this article.
