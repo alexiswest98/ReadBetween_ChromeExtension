@@ -8,7 +8,7 @@ interface Props {
 
 const ArticleBreakdown: React.FC<Props> = ({ breakdown }) => {
   return (
-    <div className="card">
+    <div id='summary-card' className="card">
       <h3 className="section-title">What's Being Reported</h3>
       <ul className="breakdown-list">
         {breakdown.reported_points.map((point, i) => (

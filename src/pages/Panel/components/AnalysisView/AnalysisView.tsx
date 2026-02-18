@@ -79,7 +79,7 @@ const AnalysisView: React.FC<Props> = ({
             breakdown={analysisResult.structured_breakdown}
           />
           <FramingSignals
-            signals={analysisResult.framing_signals}
+            structuralPatterns={analysisResult.structural_patterns}
             languageAnalysis={analysisResult.language_analysis}
           />
           <SourcesSection sources={analysisResult.sources} />

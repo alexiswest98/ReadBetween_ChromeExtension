@@ -127,7 +127,7 @@ const Panel: React.FC = () => {
       const access = determineAccessState(extraction);
       setAccessState(access);
 
-      const result = analyzeArticle(extraction);
+      const result = await analyzeArticle(extraction);
       setAnalysisResult(result);
 
       await saveLastAnalysis(result, extraction.url);

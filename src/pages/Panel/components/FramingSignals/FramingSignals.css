@@ -1,3 +1,35 @@
+/* Pattern sections (narrative structure, missing context) */
+.pattern-section {
+  margin-bottom: 12px;
+  padding-left: 10px;
+  border-left: 3px solid #333;
+}
+
+.pattern-summary {
+  margin: 2px 0;
+  font-size: 12px;
+  color: #ccc;
+  line-height: 1.5;
+}
+
+.pattern-quotes {
+  margin-top: 4px;
+}
+
+.signal-quote {
+  margin: 2px 0;
+  font-size: 11px;
+  color: #777;
+  font-style: italic;
+}
+
+/* Language analysis section */
+.language-section {
+  border-top: 1px solid #2a2a2a;
+  padding-top: 12px;
+  margin-top: 8px;
+}
+
 .framing-notable {
   margin-bottom: 12px;
 }
@@ -36,69 +68,11 @@
   font-size: 10px;
   color: #777;
   text-transform: uppercase;
-}
-
-.language-category {
-  margin-bottom: 8px;
-}
-
-.language-example {
-  font-size: 12px;
-  color: #999;
   margin-bottom: 4px;
 }
 
-.language-example strong {
-  color: #ccc;
-}
-
-.structural-patterns {
-  border-top: 1px solid #2a2a2a;
-  padding-top: 12px;
-  margin-top: 8px;
-}
-
-.signal-item {
-  margin-bottom: 10px;
-  padding-left: 10px;
-  border-left: 3px solid #333;
-}
-
-.signal-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 2px;
-}
-
-.signal-category {
-  font-size: 11px;
-  font-weight: 500;
-  color: #aaa;
-}
-
-.signal-confidence {
+.language-stat-words {
   font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 8px;
-}
-
-.signal-text {
-  margin: 2px 0;
-  font-size: 12px;
-  color: #ccc;
-}
-
-.signal-quote {
-  margin: 2px 0;
-  font-size: 11px;
-  color: #777;
-  font-style: italic;
-}
-
-.no-signals {
-  color: #777;
-  font-size: 12px;
-  font-style: italic;
-  margin-top: 8px;
+  color: #999;
+  line-height: 1.4;
 }

@@ -2,20 +2,7 @@
 
 export type SourceType = 'person' | 'agency' | 'document' | 'dataset' | 'other';
 
-export type SignalCategory =
-  | 'agency_responsibility'
-  | 'explanation_balance'
-  | 'event_framing'
-  | 'language_signals'
-  | 'missing_context';
-
-export type Confidence = 'low' | 'medium' | 'high';
-
 export type AccessState = 'full_access' | 'partial_preview' | 'paywalled';
-
-export type FramingSignalState =
-  | 'signals_detected'
-  | 'no_significant_signal_detected';
 
 export type PreviousArticlesState =
   | 'available'
@@ -49,16 +36,14 @@ export interface Sources {
   items: SourceItem[];
 }
 
-export interface FramingSignal {
-  category: SignalCategory;
-  signal: string;
-  evidence_quote: string;
-  confidence: Confidence;
+export interface StructuralPatternSection {
+  summary: string;
+  evidence_quotes: string[];
 }
 
-export interface FramingSignals {
-  state: FramingSignalState;
-  signals: FramingSignal[];
+export interface StructuralPatterns {
+  narrative_structure: StructuralPatternSection;
+  missing_context: StructuralPatternSection;
 }
 
 export interface PreviousArticle {
@@ -86,7 +71,7 @@ export interface SimilarCoverage {
 
 export interface LanguageCategoryResult {
   count: number;
-  examples: Array<{ word: string; sentence: string }>;
+  words: string[];
 }
 
 export interface LanguageAnalysis {
@@ -106,7 +91,7 @@ export interface AnalysisResult {
   article_structure: ArticleStructure;
   structured_breakdown: StructuredBreakdown;
   sources: Sources;
-  framing_signals: FramingSignals;
+  structural_patterns: StructuralPatterns;
   language_analysis: LanguageAnalysis;
   author_transparency: AuthorTransparency;
   similar_coverage: SimilarCoverage;

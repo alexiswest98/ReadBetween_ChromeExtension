@@ -1,8 +1,5 @@
 import {
-  FramingSignal,
-  SignalCategory,
-  Confidence,
-  FramingSignalState,
+  StructuralPatterns,
   LanguageAnalysis,
   LanguageCategoryResult,
 } from '../types/models';
@@ -96,205 +93,80 @@ const CERTAINTY_WORDS = [
   'irrefutable',
 ];
 
-// ========== Framing Signal Patterns ==========
+// ========== Structural Patterns (Fallback) ==========
 
-interface SignalPattern {
-  category: SignalCategory;
-  description: string;
-  test: (
-    sentences: string[],
-    fullText: string
-  ) => { detected: boolean; evidence: string; confidence: Confidence } | null;
-}
-
-const SIGNAL_PATTERNS: SignalPattern[] = [
-  {
-    category: 'agency_responsibility',
-    description: 'Passive voice used to obscure who performed the action',
-    test: (sentences) => {
-      const passivePatterns = [
-        /(?:was|were|been|being)\s+(?:\w+ed|given|taken|made|done|found|told|shown)/i,
-        /it\s+(?:was|is)\s+(?:decided|determined|announced|reported|confirmed|believed|said|expected|understood)/i,
-      ];
-      for (const s of sentences) {
-        for (const p of passivePatterns) {
-          if (p.test(s)) {
-            return {
-              detected: true,
-              evidence: s,
-              confidence: 'medium' as Confidence,
-            };
-          }
-        }
-      }
-      return null;
-    },
-  },
-  {
-    category: 'agency_responsibility',
-    description: 'Attribution shifted from actor to affected parties',
-    test: (sentences) => {
-      const patterns = [
-        /(?:victims?|affected|impacted)\s+(?:of|by)\s+/i,
-        /(?:suffered|endured|faced)\s+(?:the\s+)?(?:consequences|effects|impact)/i,
-      ];
-      for (const s of sentences) {
-        for (const p of patterns) {
-          if (p.test(s)) {
-            return {
-              detected: true,
-              evidence: s,
-              confidence: 'low' as Confidence,
-            };
-          }
-        }
-      }
-      return null;
-    },
-  },
-  {
-    category: 'explanation_balance',
-    description: 'One-sided perspective dominates without counter-viewpoint',
-    test: (sentences, fullText) => {
-      const hasCounterpoint =
-        /(?:however|on the other hand|critics|opponents|alternatively|conversely|in contrast|some argue|others say|dissent)/i.test(
-          fullText
-        );
-      if (!hasCounterpoint && sentences.length > 10) {
-        return {
-          detected: true,
-          evidence:
-            'Article presents a single perspective without explicit counter-viewpoints.',
-          confidence: 'medium' as Confidence,
-        };
-      }
-      return null;
-    },
-  },
-  {
-    category: 'event_framing',
-    description: 'Headline or lead uses loaded framing for the event',
-    test: (sentences) => {
-      if (sentences.length === 0) return null;
-      const lead = sentences[0];
-      const loadedWords =
-        /(?:crisis|scandal|controversy|bombshell|explosive|devastating|shocking|slam|blast|firestorm)/i;
-      if (loadedWords.test(lead)) {
-        return {
-          detected: true,
-          evidence: lead,
-          confidence: 'high' as Confidence,
-        };
-      }
-      return null;
-    },
-  },
-  {
-    category: 'language_signals',
-    description: 'Emotionally charged or loaded language detected',
-    test: (sentences) => {
-      for (const s of sentences) {
-        const words = s.toLowerCase().split(/\s+/);
-        const emotionalCount = words.filter((w) =>
-          EMOTIONAL_WORDS.includes(w)
-        ).length;
-        if (emotionalCount >= 2) {
-          return {
-            detected: true,
-            evidence: s,
-            confidence: 'high' as Confidence,
-          };
-        }
-      }
-      return null;
-    },
-  },
-  {
-    category: 'language_signals',
-    description:
-      'High-certainty language used for claims that may be debatable',
-    test: (sentences) => {
-      for (const s of sentences) {
-        const lower = s.toLowerCase();
-        const hasCertainty = CERTAINTY_WORDS.some((w) => lower.includes(w));
-        if (hasCertainty) {
-          return {
-            detected: true,
-            evidence: s,
-            confidence: 'medium' as Confidence,
-          };
-        }
-      }
-      return null;
-    },
-  },
-  {
-    category: 'missing_context',
-    description: 'Key context or comparison data appears absent',
-    test: (sentences, fullText) => {
-      const hasNumbers = /\d+\s*%|\$\s*\d|billion|million|thousand/i.test(
-        fullText
-      );
-      const hasComparison =
-        /(?:compared to|relative to|versus|previously|last year|year-over-year|historically|in context)/i.test(
-          fullText
-        );
-      if (hasNumbers && !hasComparison) {
-        return {
-          detected: true,
-          evidence:
-            'Statistical claims present without comparative context or baseline references.',
-          confidence: 'low' as Confidence,
-        };
-      }
-      return null;
-    },
-  },
-];
-
-// ========== Main Functions ==========
-
-export function detectFramingSignals(
+export function detectStructuralPatterns(
   text: string
 ): {
-  state: FramingSignalState;
-  signals: FramingSignal[];
+  patterns: StructuralPatterns;
   warnings: string[];
 } {
   const sentences = splitSentences(text);
-  const signals: FramingSignal[] = [];
   const warnings: string[] = [];
 
-  for (const pattern of SIGNAL_PATTERNS) {
-    const result = pattern.test(sentences, text);
-    if (result && result.detected) {
-      signals.push({
-        category: pattern.category,
-        signal: pattern.description,
-        evidence_quote:
-          result.evidence.length > 200
-            ? result.evidence.substring(0, 200) + '...'
-            : result.evidence,
-        confidence: result.confidence,
-      });
+  // Narrative structure: basic heuristic fallback
+  const narrativeNotes: string[] = [];
+  const narrativeQuotes: string[] = [];
+
+  const hasPassive =
+    /(?:was|were|been|being)\s+(?:\w+ed|given|taken|made|done|found|told|shown)/i.test(text);
+  if (hasPassive) {
+    narrativeNotes.push('The article uses passive voice constructions in places.');
+  }
+
+  const hasCounterpoint =
+    /(?:however|on the other hand|critics|opponents|alternatively|conversely|in contrast|some argue|others say|dissent)/i.test(text);
+  if (!hasCounterpoint && sentences.length > 10) {
+    narrativeNotes.push('The article presents information without explicit counter-viewpoints.');
+  }
+
+  if (sentences.length > 0) {
+    const lead = sentences[0];
+    const loadedWords =
+      /(?:crisis|scandal|controversy|bombshell|explosive|devastating|shocking|slam|blast|firestorm)/i;
+    if (loadedWords.test(lead)) {
+      narrativeNotes.push('The lead sentence uses high-intensity language.');
+      narrativeQuotes.push(
+        lead.length > 200 ? lead.substring(0, 200) + '...' : lead
+      );
     }
   }
 
-  const limitedSignals = signals.slice(0, 4);
-
-  const state: FramingSignalState =
-    limitedSignals.length > 0
-      ? 'signals_detected'
-      : 'no_significant_signal_detected';
-
-  if (state === 'no_significant_signal_detected') {
-    warnings.push(
-      'No significant framing signals detected. Language is procedural; claims are attributed; limited loaded wording.'
-    );
+  if (narrativeNotes.length === 0) {
+    narrativeNotes.push('The article follows a conventional news structure.');
   }
 
-  return { state, signals: limitedSignals, warnings };
+  // Missing context: basic heuristic
+  const missingNotes: string[] = [];
+  const missingQuotes: string[] = [];
+
+  const hasNumbers = /\d+\s*%|\$\s*\d|billion|million|thousand/i.test(text);
+  const hasComparison =
+    /(?:compared to|relative to|versus|previously|last year|year-over-year|historically|in context)/i.test(text);
+  if (hasNumbers && !hasComparison) {
+    missingNotes.push('Statistical claims are present without comparative context or baseline references.');
+  }
+
+  if (missingNotes.length === 0) {
+    missingNotes.push("No significant contextual gaps detected based on the article's scope.");
+  }
+
+  return {
+    patterns: {
+      narrative_structure: {
+        summary: narrativeNotes.join(' '),
+        evidence_quotes: narrativeQuotes,
+      },
+      missing_context: {
+        summary: missingNotes.join(' '),
+        evidence_quotes: missingQuotes,
+      },
+    },
+    warnings,
+  };
 }
+
+// ========== Language Analysis ==========
 
 export function analyzeLanguage(text: string): LanguageAnalysis {
   const sentences = splitSentences(text);
@@ -335,9 +207,9 @@ function findWordMatches(
   sentences: string[],
   dictionary: string[]
 ): LanguageCategoryResult {
-  const examples: Array<{ word: string; sentence: string }> = [];
+  const foundWords: string[] = [];
   let count = 0;
-  const seenSentences = new Set<string>();
+  const seen = new Set<string>();
 
   for (const sentence of sentences) {
     const lower = sentence.toLowerCase();
@@ -347,15 +219,9 @@ function findWordMatches(
       const cleaned = word.replace(/[^a-z]/g, '');
       if (dictionary.includes(cleaned)) {
         count++;
-        if (examples.length < 3 && !seenSentences.has(sentence)) {
-          seenSentences.add(sentence);
-          examples.push({
-            word: cleaned,
-            sentence:
-              sentence.length > 150
-                ? sentence.substring(0, 150) + '...'
-                : sentence,
-          });
+        if (foundWords.length < 5 && !seen.has(cleaned)) {
+          seen.add(cleaned);
+          foundWords.push(cleaned);
         }
       }
     }
@@ -363,19 +229,13 @@ function findWordMatches(
     for (const phrase of dictionary) {
       if (phrase.includes(' ') && lower.includes(phrase)) {
         count++;
-        if (examples.length < 3 && !seenSentences.has(sentence)) {
-          seenSentences.add(sentence);
-          examples.push({
-            word: phrase,
-            sentence:
-              sentence.length > 150
-                ? sentence.substring(0, 150) + '...'
-                : sentence,
-          });
+        if (foundWords.length < 5 && !seen.has(phrase)) {
+          seen.add(phrase);
+          foundWords.push(phrase);
         }
       }
     }
   }
 
-  return { count, examples };
+  return { count, words: foundWords };
 }
