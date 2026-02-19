@@ -19,7 +19,7 @@ const SOURCE_PATTERNS: SourcePattern[] = [
     type: 'person',
     nameExtractor: (m) => m[1],
   },
-  // Post-quote attribution: `," Name said` or `," said Name`
+  // Post-quote attribution: `," Name said`
   {
     pattern: new RegExp(
       `[""\\u201C\\u201D]\\s*,?\\s*([A-Z][a-z]+ (?:[A-Z]\\. )?[A-Z][a-z]+)\\s+(?:${SPEECH_VERBS})`
@@ -27,18 +27,18 @@ const SOURCE_PATTERNS: SourcePattern[] = [
     type: 'person',
     nameExtractor: (m) => m[1],
   },
-  // Verb-before-name: `said John Thune`
+  // Verb-before-name with quote context: `"..." said John Thune`
   {
     pattern: new RegExp(
-      `(?:${SPEECH_VERBS})\\s+([A-Z][a-z]+ (?:[A-Z]\\. )?[A-Z][a-z]+)`
+      `[""\\u201C\\u201D].*?(?:${SPEECH_VERBS})\\s+([A-Z][a-z]+ (?:[A-Z]\\. )?[A-Z][a-z]+)`
     ),
     type: 'person',
     nameExtractor: (m) => m[1],
   },
-  // Title + name: `Sen. Thune`, `President Biden`
+  // Title + name: `Chief Justice Roberts`, `Sen. Thune`, `President Biden`
   {
     pattern:
-      /(?:Sen\.|Rep\.|President|Secretary|Director|Dr\.|Prof\.|Gov\.|Mayor|Chief|Chairman|Chairwoman|Gen\.|Adm\.|Col\.)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/,
+      /(?:Chief Justice|Vice President|Deputy Director|Sen\.|Rep\.|President|Secretary|Director|Dr\.|Prof\.|Gov\.|Mayor|Chairman|Chairwoman|Gen\.|Adm\.|Col\.)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/,
     type: 'person',
     nameExtractor: (m) => m[1],
   },
@@ -71,6 +71,17 @@ const SOURCE_PATTERNS: SourcePattern[] = [
   },
 ];
 
+// Names that match person patterns but are actually organizations/publications
+const NOT_PERSON_NAMES = new Set([
+  'fox news', 'fox business', 'fox digital',
+  'cnn digital', 'cbs news', 'abc news', 'nbc news',
+  'associated press', 'the associated',
+  'reuters news',
+  'new york', 'los angeles', 'wall street', 'washington post',
+  'supreme court', 'white house', 'united states', 'united nations',
+  'close video', 'watch video',
+]);
+
 const ANONYMOUS_PATTERNS = [
   /officials?\s+(?:who\s+)?(?:said|say|told|confirmed)/i,
   /sources?\s+(?:familiar|close|with\s+knowledge)/i,
@@ -78,6 +89,9 @@ const ANONYMOUS_PATTERNS = [
   /(?:spoke|speaking)\s+(?:on\s+)?(?:condition\s+of\s+)?anonymity/i,
   /(?:asked|requesting)\s+(?:not\s+to\s+be\s+(?:named|identified))/i,
 ];
+
+const BOILERPLATE_MARKERS =
+  /^(?:close video|watch video|related:|advertisement|subscribe|sign up|click here|share this|getty images|ap photo)/i;
 
 export function findSources(
   text: string
@@ -88,12 +102,20 @@ export function findSources(
   const warnings: string[] = [];
 
   for (const sentence of sentences) {
+    // Skip boilerplate/non-article content
+    if (BOILERPLATE_MARKERS.test(sentence.trim())) continue;
+
     for (const pattern of SOURCE_PATTERNS) {
       const match = sentence.match(pattern.pattern);
       if (match) {
         const name = pattern.nameExtractor(match);
-        if (!seenNames.has(name.toLowerCase())) {
-          seenNames.add(name.toLowerCase());
+        const nameLower = name.toLowerCase();
+
+        // Skip known non-person names (organizations, publications)
+        if (NOT_PERSON_NAMES.has(nameLower)) continue;
+
+        if (!seenNames.has(nameLower)) {
+          seenNames.add(nameLower);
           found.push({
             source_name: name,
             source_type: pattern.type,

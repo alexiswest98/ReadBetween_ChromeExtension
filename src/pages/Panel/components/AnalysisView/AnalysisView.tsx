@@ -7,6 +7,7 @@ import SourcesSection from '../SourcesSection/SourcesSection';
 import { MissingContextCard, NarrativeStructureCard, ToneIndicatorsCard } from '../FramingSignals/FramingSignals';
 import AuthorTransparency from '../AuthorTransparency/AuthorTransparency';
 import SimilarCoverage from '../SimilarCoverage/SimilarCoverage';
+import CollapsibleCard from '../CollapsibleCard/CollapsibleCard';
 import ActionsBar from '../ActionsBar/ActionsBar';
 import Footer from '../Footer/Footer';
 import logo from '../../../../assets/img/ReadBetweenLogo_White.png';
@@ -75,23 +76,34 @@ const AnalysisView: React.FC<Props> = ({
           <ArticleContext
             structure={analysisResult.article_structure}
           />
-          <ArticleBreakdown
-            breakdown={analysisResult.structured_breakdown}
-          />
-          <SourcesSection sources={analysisResult.sources} />
-          <MissingContextCard
-            missingContext={analysisResult.structural_patterns.missing_context}
-          />
-          <NarrativeStructureCard
-            narrativeStructure={analysisResult.structural_patterns.narrative_structure}
-          />
-          <ToneIndicatorsCard
-            languageAnalysis={analysisResult.language_analysis}
-          />
-          <AuthorTransparency
-            author={analysisResult.author_transparency}
-          />
-          <SimilarCoverage analysisResult={analysisResult} />
+
+          <CollapsibleCard id="summary-card" title="What's Being Reported" titleClassName="section-title">
+            <ArticleBreakdown breakdown={analysisResult.structured_breakdown} />
+          </CollapsibleCard>
+
+          <CollapsibleCard id="sources-card" title="Sources & Attribution" titleClassName="section-title">
+            <SourcesSection sources={analysisResult.sources} />
+          </CollapsibleCard>
+
+          <CollapsibleCard id="missing-card" title="What's Not Included" titleClassName="section-title">
+            <MissingContextCard missingContext={analysisResult.structural_patterns.missing_context} />
+          </CollapsibleCard>
+
+          <CollapsibleCard id="narrative-card" title="How the Story Is Structured" titleClassName="section-title white-title">
+            <NarrativeStructureCard narrativeStructure={analysisResult.structural_patterns.narrative_structure} />
+          </CollapsibleCard>
+
+          <CollapsibleCard title="Tone Indicators" titleClassName="section-title white-title">
+            <ToneIndicatorsCard languageAnalysis={analysisResult.language_analysis} />
+          </CollapsibleCard>
+
+          <CollapsibleCard id="author-card" title="Author Transparency" titleClassName="section-title white-title">
+            <AuthorTransparency author={analysisResult.author_transparency} />
+          </CollapsibleCard>
+
+          <CollapsibleCard id="coverage-card" title="Find Similar Coverage" titleClassName="section-title white-title">
+            <SimilarCoverage analysisResult={analysisResult} />
+          </CollapsibleCard>
 
           {/* Notices / Warnings */}
           {analysisResult.meta.warnings.length > 0 && (

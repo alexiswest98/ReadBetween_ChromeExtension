@@ -18,7 +18,7 @@ const ActionsBar: React.FC<Props> = ({
 }) => {
   return (
     <div className="card">
-      <h3 className="section-title">Actions</h3>
+      <h3 className="section-title white-title">Actions</h3>
       <div className="actions-buttons">
         {/* <button onClick={onOpenArticle} className="action-button">
           Read Full Article

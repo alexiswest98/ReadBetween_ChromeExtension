@@ -4,17 +4,18 @@
 
 /* design system typography */
 h1 {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 700;
+  line-height: 1.3rem;
 }
 
 h2 {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 h3 {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 
@@ -23,7 +24,7 @@ body {
   padding: 0;
   background: #111;
   font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   color: #e0e0e0;
 }
@@ -100,7 +101,7 @@ button:active {
 }
 
 .section-title {
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   /* font-size: 11px; */
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -112,4 +113,8 @@ button:active {
   /* font-size: 12px; */
   /* font-weight: 600; */
   color: #bbb;
+}
+
+.white-title {
+  color: white;
 }

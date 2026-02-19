@@ -36,9 +36,7 @@ const SimilarCoverage: React.FC<Props> = ({ analysisResult }) => {
   };
 
   return (
-    <div className="card">
-      <h3 className="section-title">Find Similar Coverage</h3>
-
+    <>
       {!searched && !loading && (
         <div className="similar-search-prompt">
           <p className="similar-search-text">
@@ -97,7 +95,7 @@ const SimilarCoverage: React.FC<Props> = ({ analysisResult }) => {
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
 /* Bullet list for summary sentences */
 #missing-card {
-  background-color: #C8583F;
+  background-color: #E7CC3D;
 }
 
 .pattern-bullet-list {
@@ -8,11 +8,16 @@
   padding-left: 20px;
 }
 
+.missing-bullet-item {
+    margin-bottom: 6px;
+    line-height: 1.5;
+}
+
 .pattern-bullet-item {
   margin-bottom: 6px;
   /* font-size: 12px; */
   /* color: #ccc; */
-  /* color: white; */
+  color: white;
   line-height: 1.5;
 }
 
@@ -21,10 +26,17 @@
   margin-top: 4px;
 }
 
+.missing-quote {
+    margin: 2px 0;
+    font-size: .7rem;
+    color: #1E1E1E;
+    font-style: italic;
+}
+
 .signal-quote {
   margin: 2px 0;
   font-size: .7rem;
-  color: #1e1e1e;
+  color: #999;
   font-style: italic;
 }
 

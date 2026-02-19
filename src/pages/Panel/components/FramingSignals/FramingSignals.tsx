@@ -17,23 +17,22 @@ export const MissingContextCard: React.FC<MissingContextProps> = ({ missingConte
     .filter((s) => s.trim().length > 0);
 
   return (
-    <div id="missing-card" className="card">
-      <h3 className="section-title">What's Not Included</h3>
+    <>
       <ul className="pattern-bullet-list">
         {sentences.map((sentence, i) => (
-          <li key={i} className="pattern-bullet-item">{sentence}</li>
+          <li key={i} className="missing-bullet-item">{sentence}</li>
         ))}
       </ul>
       {missingContext.evidence_quotes.length > 0 && (
         <div className="pattern-quotes">
           {missingContext.evidence_quotes.map((quote, i) => (
-            <p key={i} className="signal-quote">
+            <p key={i} className="missing-quote">
               {quote}
             </p>
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 };
 
@@ -49,8 +48,7 @@ export const NarrativeStructureCard: React.FC<NarrativeStructureProps> = ({ narr
     .filter((s) => s.trim().length > 0);
 
   return (
-    <div className="card">
-      <h3 className="section-title">How the Story Is Structured</h3>
+    <>
       <ul className="pattern-bullet-list">
         {sentences.map((sentence, i) => (
           <li key={i} className="pattern-bullet-item">{sentence}</li>
@@ -65,7 +63,7 @@ export const NarrativeStructureCard: React.FC<NarrativeStructureProps> = ({ narr
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 };
 
@@ -76,7 +74,7 @@ const LanguageStat: React.FC<{ label: string; count: number; words: string[] }> 
   count,
   words,
 }) => (
-  <div className="language-stat">
+  <div id="tone-card" className="language-stat">
     <div className={`language-stat-value${count === 0 ? ' zero' : ''}`}>
       {count}
     </div>
@@ -95,9 +93,7 @@ interface ToneIndicatorsProps {
 
 export const ToneIndicatorsCard: React.FC<ToneIndicatorsProps> = ({ languageAnalysis }) => {
   return (
-    <div className="card">
-      <h3 className="section-title">Tone Indicators</h3>
-
+    <>
       {languageAnalysis.notable_choices.length > 0 && (
         <ul className="pattern-bullet-list">
           {languageAnalysis.notable_choices.map((choice, i) => (
@@ -123,6 +119,6 @@ export const ToneIndicatorsCard: React.FC<ToneIndicatorsProps> = ({ languageAnal
           words={languageAnalysis.certainty_language.words}
         />
       </div>
-    </div>
+    </>
   );
 };
