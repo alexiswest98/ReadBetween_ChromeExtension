@@ -7,6 +7,7 @@ interface Props {
   titleClassName?: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  variant?: 'default' | 'dark';
 }
 
 const ChevronDown: React.FC = () => (
@@ -32,11 +33,19 @@ const CollapsibleCard: React.FC<Props> = ({
   titleClassName = 'section-title',
   children,
   defaultOpen = true,
+  variant = 'default',
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
+  const isDark = variant === 'dark';
+  const cardClasses = [
+    'card',
+    isDark ? 'collapsible-dark' : '',
+    isDark && isOpen ? 'collapsible-dark-open' : '',
+  ].filter(Boolean).join(' ');
+
   return (
-    <div id={id} className="card">
+    <div id={id} className={cardClasses}>
       <button
         className="collapsible-header"
         onClick={() => setIsOpen((prev) => !prev)}

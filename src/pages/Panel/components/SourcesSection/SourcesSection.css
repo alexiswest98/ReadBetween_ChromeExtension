@@ -1,5 +1,5 @@
 #sources-card {
-  background-color: #8CCA82;
+  background-color: rgb(140, 202, 130, 0.8);
 }
 
 
@@ -12,7 +12,7 @@
 .source-item {
   margin-bottom: 10px;
   padding-left: 10px;
-  border-left: 3px solid #1E1E1E;
+  border-left: 3px solid black;
 }
 
 .source-header {
@@ -40,6 +40,6 @@
 .source-quote {
   margin: 2px 0;
   font-size: 0.7rem;
-  color: #1E1E1E;
+  color: #313131;
   font-style: italic;
 }

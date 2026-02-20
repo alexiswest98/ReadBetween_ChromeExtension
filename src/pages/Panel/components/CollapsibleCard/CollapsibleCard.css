@@ -48,3 +48,16 @@
   opacity: 1;
   margin-top: 8px;
 }
+
+/* Dark variant: white chevron, #050341 bg when expanded */
+.collapsible-dark .collapsible-chevron {
+  color: #fff;
+}
+
+.collapsible-dark {
+  transition: background-color 0.3s ease;
+}
+
+.card.collapsible-dark-open {
+  background: rgb(3, 0, 84, 0.8) !important;
+}

@@ -89,19 +89,19 @@ const AnalysisView: React.FC<Props> = ({
             <MissingContextCard missingContext={analysisResult.structural_patterns.missing_context} />
           </CollapsibleCard>
 
-          <CollapsibleCard id="narrative-card" title="How the Story Is Structured" titleClassName="section-title white-title">
+          <CollapsibleCard id="narrative-card" title="How the Story Is Structured" titleClassName="section-title white-title" defaultOpen={false} variant="dark">
             <NarrativeStructureCard narrativeStructure={analysisResult.structural_patterns.narrative_structure} />
           </CollapsibleCard>
 
-          <CollapsibleCard title="Tone Indicators" titleClassName="section-title white-title">
+          <CollapsibleCard title="Tone Indicators" titleClassName="section-title white-title" defaultOpen={false} variant="dark">
             <ToneIndicatorsCard languageAnalysis={analysisResult.language_analysis} />
           </CollapsibleCard>
 
-          <CollapsibleCard id="author-card" title="Author Transparency" titleClassName="section-title white-title">
+          <CollapsibleCard id="author-card" title="Author Transparency" titleClassName="section-title white-title" defaultOpen={false} variant="dark">
             <AuthorTransparency author={analysisResult.author_transparency} />
           </CollapsibleCard>
 
-          <CollapsibleCard id="coverage-card" title="Find Similar Coverage" titleClassName="section-title white-title">
+          <CollapsibleCard id="coverage-card" title="Find Similar Coverage" titleClassName="section-title white-title" defaultOpen={false} variant="dark">
             <SimilarCoverage analysisResult={analysisResult} />
           </CollapsibleCard>
 

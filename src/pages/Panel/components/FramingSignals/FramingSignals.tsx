@@ -58,7 +58,7 @@ export const NarrativeStructureCard: React.FC<NarrativeStructureProps> = ({ narr
         <div className="pattern-quotes">
           {narrativeStructure.evidence_quotes.map((quote, i) => (
             <p key={i} className="signal-quote">
-              &ldquo;{quote}&rdquo;
+              {quote}
             </p>
           ))}
         </div>

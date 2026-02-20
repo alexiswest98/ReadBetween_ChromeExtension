@@ -1,17 +1,25 @@
+#actions-card {
+  background: #111;
+  border: 1px solid black;
+  margin-top: 20px;
+}
+
 .actions-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  justify-content: space-evenly;
+  /* margin-top: 12px; */
 }
 
 .action-button {
   padding: 8px 14px;
   border: 1px solid #333;
   border-radius: 4px;
-  background: #1e1e1e;
+  background: #313131;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #ccc;
+  box-shadow: 0 1px 5px rgba(255, 255, 255, 0.4);
 }
 
 .action-button:disabled {

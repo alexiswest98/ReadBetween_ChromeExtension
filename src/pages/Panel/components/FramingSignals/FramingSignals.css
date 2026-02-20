@@ -1,6 +1,6 @@
 /* Bullet list for summary sentences */
 #missing-card {
-  background-color: #E7CC3D;
+  background-color: rgb(231, 204, 61, 0.8);
 }
 
 .pattern-bullet-list {
@@ -23,20 +23,20 @@
 
 /* Evidence quotes (grey, italic) */
 .pattern-quotes {
-  margin-top: 4px;
+  margin-top: 12px;
 }
 
 .missing-quote {
     margin: 2px 0;
     font-size: .7rem;
-    color: #1E1E1E;
+    color: #313131;
     font-style: italic;
 }
 
 .signal-quote {
   margin: 2px 0;
   font-size: .7rem;
-  color: #999;
+  color: #d1d1d1;
   font-style: italic;
 }
 
@@ -51,29 +51,30 @@
 .language-stat {
   text-align: center;
   padding: 8px;
-  background: #252525;
+  background: rgb(219, 220, 241, 0.8);
   border-radius: 4px;
 }
 
 .language-stat-value {
-  font-size: 18px;
+  font-size: 1.1rem;
   font-weight: 600;
-  color: #e0e0e0;
+  color: #000000;
 }
 
 .language-stat-value.zero {
-  color: #555;
+  color: #888888;
 }
 
 .language-stat-label {
-  font-size: 10px;
-  color: #777;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #000000;
   text-transform: uppercase;
   margin-bottom: 4px;
 }
 
 .language-stat-words {
-  font-size: 10px;
-  color: #999;
+  font-size: 0.55rem;
+  color: #313131;
   line-height: 1.4;
 }
