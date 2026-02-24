@@ -93,6 +93,9 @@ const ANONYMOUS_PATTERNS = [
 const BOILERPLATE_MARKERS =
   /^(?:close video|watch video|related:|advertisement|subscribe|sign up|click here|share this|getty images|ap photo)/i;
 
+const PHOTO_CREDIT_PATTERN =
+  /\([^)]*(?:Getty\s*Images|AP\s*Photo|Anadolu|AFP|Reuters|Shutterstock|iStock)[^)]*\)/gi;
+
 export function findSources(
   text: string
 ): { items: SourceItem[]; warnings: string[] } {
@@ -105,8 +108,11 @@ export function findSources(
     // Skip boilerplate/non-article content
     if (BOILERPLATE_MARKERS.test(sentence.trim())) continue;
 
+    // Strip inline photo credits so they don't pollute matches or evidence quotes
+    const cleaned = sentence.replace(PHOTO_CREDIT_PATTERN, '').trim();
+
     for (const pattern of SOURCE_PATTERNS) {
-      const match = sentence.match(pattern.pattern);
+      const match = cleaned.match(pattern.pattern);
       if (match) {
         const name = pattern.nameExtractor(match);
         const nameLower = name.toLowerCase();
@@ -116,13 +122,20 @@ export function findSources(
 
         if (!seenNames.has(nameLower)) {
           seenNames.add(nameLower);
+
+          // Extract context around the match rather than from the sentence start
+          const idx = match.index ?? 0;
+          const start = Math.max(0, idx - 60);
+          const end = Math.min(cleaned.length, idx + 160);
+          const prefix = start > 0 ? '...' : '';
+          const suffix = end < cleaned.length ? '...' : '';
+          const evidence_quote =
+            prefix + cleaned.substring(start, end).trim() + suffix;
+
           found.push({
             source_name: name,
             source_type: pattern.type,
-            evidence_quote:
-              sentence.length > 200
-                ? sentence.substring(0, 200) + '...'
-                : sentence,
+            evidence_quote,
           });
         }
       }

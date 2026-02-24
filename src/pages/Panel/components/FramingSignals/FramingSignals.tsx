@@ -13,7 +13,7 @@ interface MissingContextProps {
 
 export const MissingContextCard: React.FC<MissingContextProps> = ({ missingContext }) => {
   const sentences = missingContext.summary
-    .split(/(?<=\.)\s+/)
+    .split(/(?<=\.)\s+(?=[A-Z])/)
     .filter((s) => s.trim().length > 0);
 
   return (
@@ -44,7 +44,7 @@ interface NarrativeStructureProps {
 
 export const NarrativeStructureCard: React.FC<NarrativeStructureProps> = ({ narrativeStructure }) => {
   const sentences = narrativeStructure.summary
-    .split(/(?<=\.)\s+/)
+    .split(/(?<=\.)\s+(?=[A-Z])/)
     .filter((s) => s.trim().length > 0);
 
   return (
