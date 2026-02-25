@@ -3,6 +3,7 @@ import {
   StructuralPatternSection,
   LanguageAnalysis,
 } from '../../../../types/models';
+import { splitSentences } from '../../../../utils/textUtils';
 import './FramingSignals.css';
 
 // ========== What's Not Included (Missing Context) ==========
@@ -12,9 +13,7 @@ interface MissingContextProps {
 }
 
 export const MissingContextCard: React.FC<MissingContextProps> = ({ missingContext }) => {
-  const sentences = missingContext.summary
-    .split(/(?<=\.)\s+(?=[A-Z])/)
-    .filter((s) => s.trim().length > 0);
+  const sentences = splitSentences(missingContext.summary);
 
   return (
     <>
@@ -48,9 +47,7 @@ export const NarrativeStructureCard: React.FC<NarrativeStructureProps> = ({ narr
     return <p className="card-loading-hint">Analyzing structure and tone…</p>;
   }
 
-  const sentences = narrativeStructure.summary
-    .split(/(?<=\.)\s+(?=[A-Z])/)
-    .filter((s) => s.trim().length > 0);
+  const sentences = splitSentences(narrativeStructure.summary);
 
   return (
     <>

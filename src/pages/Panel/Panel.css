@@ -49,7 +49,7 @@ button:active {
 
 /* Panel root */
 .panel-root {
-  /* font-size: 13px; */
+  /* font-size: 0.8125rem; */
   color: #000000;
   min-height: 100vh;
   background: #111;
@@ -73,7 +73,7 @@ button:active {
   background: transparent;
   border-bottom: none;
   /* font-weight: 400; */
-  /* font-size: 13px; */
+  /* font-size: 0.8125rem; */
   color: #aaa;
   border-radius: 20px;
   transition: background 0.2s, color 0.2s;
@@ -102,7 +102,7 @@ button:active {
 
 .section-title {
   margin: 0 0 8px;
-  /* font-size: 11px; */
+  /* font-size: 0.6875rem; */
   text-transform: uppercase;
   letter-spacing: 0.5px;
   /* color: #050341; */
@@ -110,7 +110,7 @@ button:active {
 
 .subtitle {
   margin: 0 0 6px;
-  /* font-size: 12px; */
+  /* font-size: 0.75rem; */
   /* font-weight: 600; */
   color: #bbb;
 }

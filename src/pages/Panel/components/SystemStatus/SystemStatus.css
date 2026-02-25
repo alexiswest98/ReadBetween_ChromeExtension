@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .status-dot {
@@ -29,12 +29,12 @@
   margin-left: auto;
   padding: 2px 8px;
   border-radius: 10px;
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 500;
 }
 
 .status-error {
   margin: 8px 0 0;
   color: #e74c3c;
-  font-size: 12px;
+  font-size: 0.75rem;
 }

@@ -3,7 +3,7 @@
 } */
 
 .author-info {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #ffffff;
 }
 
@@ -21,7 +21,7 @@
 }
 
 .author-other-label {
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .author-article-item {
@@ -31,12 +31,12 @@
 .author-article-link {
   color: #5b9bd5;
   text-decoration: none;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .author-no-articles {
   margin: 8px 0 0;
   color: #666;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-style: italic;
 }

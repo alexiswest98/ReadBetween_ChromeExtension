@@ -15,8 +15,24 @@ export function countWords(text: string): number {
 }
 
 export function splitSentences(text: string): string[] {
-  const sentences = text.match(/[^.!?]*[.!?]+[\s]*/g) || [];
-  return sentences.map((s) => s.trim()).filter((s) => s.length > 10);
+  const ABBREV = '\x01'; // placeholder for abbreviation periods (not sentence ends)
+  const DELIM  = '\x02'; // sentence boundary marker
+
+  const masked = text
+    // Titles and common abbreviations whose period is NOT a sentence end
+    .replace(
+      /\b(Dr|Mr|Mrs|Ms|Prof|Sen|Rep|Gov|Gen|Adm|Col|Lt|Sgt|Pvt|Capt|Jr|Sr|St|vs|etc|No|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Ave|Blvd|Rd)\./gi,
+      '$1' + ABBREV
+    )
+    // Single uppercase initial before a space: "J. Smith", "U.S. News", "D.C. Circuit"
+    .replace(/\b([A-Z])\.(?=\s)/g, '$1' + ABBREV);
+
+  return masked
+    // Mark real sentence boundaries: . ! ? followed by whitespace then uppercase
+    .replace(/([.!?])\s+(?=[A-Z])/g, '$1' + DELIM)
+    .split(DELIM)
+    .map(s => s.replace(/\x01/g, '.').trim())
+    .filter(s => s.length > 10);
 }
 
 export function cleanText(text: string): string {

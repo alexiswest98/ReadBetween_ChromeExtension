@@ -25,7 +25,7 @@
 
 .analysis-tagline {
   color: #DBDCF1;
-  font-size: 0.75rem;
+  /* font-size: 0.75rem; */
   font-weight: 600;
   line-height: 1.5;
   margin: 0 0 16px;
@@ -34,17 +34,21 @@
 
 .analysis-description {
   color: #E7cc3D;
-  font-size: 0.625rem;
-  font-weight: 500;
+  /* font-size: 0.7rem; */
+  /* font-weight: 500; */
   line-height: 1.5;
-  margin: 0 0 12px;
+  margin: 0 0 16px;
   max-width: 340px;
+}
+
+#notices-title {
+  color: #9B0003;
 }
 
 .analysis-save-hint {
   color: #8CCA82;
-  font-size: 0.625rem;
-  font-weight: 500;
+  /* font-size: 0.7rem; */
+  /* font-weight: 500; */
   margin: 0 0 28px;
 }
 
@@ -64,12 +68,23 @@
 .analysis-loading {
   text-align: center;
   padding: 32px 16px;
-  color: #888;
+  color: #888888;
 }
 
 /* Notices */
 .notice-text {
   color: #aaa;
-  font-size: 12px;
+  font-size: 0.75rem;
   margin: 4px 0;
+}
+
+/* Paywall notice */
+.paywall-notice-card {
+  background-color: rgba(255, 220, 100, 0.5);
+}
+
+.paywall-notice-text {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #333;
 }

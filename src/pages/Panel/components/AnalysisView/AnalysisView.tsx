@@ -101,7 +101,41 @@ const AnalysisView: React.FC<Props> = ({
         </div>
       )}
 
-      {analysisResult && !loading && (
+      {/* Paywalled view: limited summary, similar coverage, notice */}
+      {analysisResult && !loading && accessState?.state === 'paywalled' && (
+        <>
+          <CollapsibleCard id="summary-card" title="What's Being Reported" titleClassName="section-title">
+            <ArticleBreakdown breakdown={{
+              reported_points: analysisResult.structured_breakdown.reported_points.slice(0, 3)
+            }} />
+          </CollapsibleCard>
+
+          <CollapsibleCard id="coverage-card" title="Find Similar Coverage" titleClassName="section-title white-title" defaultOpen={false} variant="dark">
+            <SimilarCoverage
+              analysisResult={analysisResult}
+              stage3Status={stage3Status}
+            />
+          </CollapsibleCard>
+
+          <div className="card paywall-notice-card">
+            <p className="paywall-notice-text">
+              This summary was generated from limited text available before the paywall. Full article content could not be accessed.
+            </p>
+          </div>
+
+          <ActionsBar
+            onRefresh={onRefresh}
+            onSave={onSave}
+            onCopyJson={onCopyJson}
+            onOpenArticle={onOpenArticle}
+            isCurrentSaved={isCurrentSaved}
+          />
+          <Footer />
+        </>
+      )}
+
+      {/* Full view */}
+      {analysisResult && !loading && accessState?.state !== 'paywalled' && (
         <>
           <CollapsibleCard id="summary-card" title="What's Being Reported" titleClassName="section-title">
             <ArticleBreakdown breakdown={analysisResult.structured_breakdown} />
@@ -143,7 +177,7 @@ const AnalysisView: React.FC<Props> = ({
           {/* Notices / Warnings */}
           {analysisResult.meta.warnings.length > 0 && (
             <div className="card">
-              <h3 className="section-title">Notices</h3>
+              <h3 id="notices-title" className="section-title">Notices</h3>
               {analysisResult.meta.warnings.map((w, i) => (
                 <p key={i} className="notice-text">
                   {w}
