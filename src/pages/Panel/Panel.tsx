@@ -5,6 +5,7 @@ import {
   AccessStateResult,
   SavedArticle,
   StageStatus,
+  Stage1Response,
 } from '../../types/models';
 import { streamStage1, fetchStage2, analyzeArticleFallback, formatDate } from '../../utils/analyzer';
 import { fetchSimilarCoverage } from '../../utils/similarCoverage';
@@ -154,8 +155,8 @@ const Panel: React.FC = () => {
         reading_time: calculateReadingTime(extraction.wordCount),
       };
 
-      // — Stage 1: Streamed critical analysis —
-      let stage1Result;
+      // — Stage 1: Critical analysis —
+      let stage1Result: Stage1Response;
       try {
         stage1Result = await streamStage1(
           cleanedText,
