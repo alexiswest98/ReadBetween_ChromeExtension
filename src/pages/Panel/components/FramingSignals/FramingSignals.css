@@ -40,6 +40,13 @@
   font-style: italic;
 }
 
+.card-loading-hint {
+  font-size: 0.75rem;
+  color: #aaa;
+  font-style: italic;
+  margin: 0;
+}
+
 /* Language stats grid */
 .language-stats-grid {
   display: grid;

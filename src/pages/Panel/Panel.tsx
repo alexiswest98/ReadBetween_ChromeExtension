@@ -4,8 +4,14 @@ import {
   ExtractionResult,
   AccessStateResult,
   SavedArticle,
+  StageStatus,
 } from '../../types/models';
-import { analyzeArticle } from '../../utils/analyzer';
+import { streamStage1, fetchStage2, analyzeArticleFallback, formatDate } from '../../utils/analyzer';
+import { fetchSimilarCoverage } from '../../utils/similarCoverage';
+import { preprocessArticle } from '../../utils/preprocessArticle';
+import { findSources } from '../../utils/sourceFinder';
+import { analyzeLanguage } from '../../utils/framingSignals';
+import { calculateReadingTime } from '../../utils/textUtils';
 import { determineAccessState } from '../../utils/accessState';
 import {
   saveLastAnalysis,
@@ -18,7 +24,6 @@ import {
 import AnalysisView from './components/AnalysisView/AnalysisView';
 import SavedArticlesView from './components/SavedArticlesView/SavedArticlesView';
 import './Panel.css';
-import logo from '../../assets/img/ReadBetweenLogo_White.png';
 
 type View = 'analysis' | 'saved';
 
@@ -26,10 +31,14 @@ const Panel: React.FC = () => {
   const [view, setView] = useState<View>('analysis');
   const [analysisResult, setAnalysisResult] =
     useState<AnalysisResult | null>(null);
+  const [extractionResult, setExtractionResult] =
+    useState<ExtractionResult | null>(null);
   const [accessState, setAccessState] =
     useState<AccessStateResult | null>(null);
   const [savedArticles, setSavedArticles] = useState<SavedArticle[]>([]);
   const [loading, setLoading] = useState(false);
+  const [stage2Status, setStage2Status] = useState<StageStatus>('idle');
+  const [stage3Status, setStage3Status] = useState<StageStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
   const [articleDetected, setArticleDetected] = useState(false);
@@ -74,13 +83,11 @@ const Panel: React.FC = () => {
         );
         return null;
       } catch {
-        // Content script not injected — try programmatic injection
         try {
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             files: ['contentScript.bundle.js'],
           });
-          // Brief delay for script initialization
           await new Promise((r) => setTimeout(r, 100));
           const response = await chrome.tabs.sendMessage(tab.id, {
             type: 'EXTRACT_ARTICLE',
@@ -101,41 +108,171 @@ const Panel: React.FC = () => {
     setLoading(true);
     setError(null);
     setArticleDetected(false);
+    setAnalysisResult(null);
+    setExtractionResult(null);
+    setStage2Status('idle');
+    setStage3Status('idle');
 
     try {
+      // — Extract article from page —
       const extraction = await extractFromTab();
       if (!extraction) {
         setLoading(false);
         return;
       }
-
       if (!extraction.success) {
         setError(extraction.error || 'Failed to extract article content.');
         setLoading(false);
         return;
       }
-
       if (extraction.wordCount < 50) {
         setError('No article content detected on this page.');
         setLoading(false);
         return;
       }
 
+      // Show ArticleContext immediately
+      setExtractionResult(extraction);
       setArticleDetected(true);
       setCurrentUrl(extraction.url);
 
       const access = determineAccessState(extraction);
       setAccessState(access);
 
-      const result = await analyzeArticle(extraction);
-      setAnalysisResult(result);
+      // Preprocess article text
+      const cleanedText = preprocessArticle(extraction.mainText);
 
-      await saveLastAnalysis(result, extraction.url);
+      // Regex-based sources (synchronous, no API cost)
+      const sourceResult = findSources(extraction.mainText);
+      const warnings: string[] = [...sourceResult.warnings];
+      const sources = { items: sourceResult.items };
+
+      const article_structure = {
+        headline: extraction.headline || 'No headline detected',
+        publication: extraction.publication,
+        published_date: formatDate(extraction.published_date),
+        reading_time: calculateReadingTime(extraction.wordCount),
+      };
+
+      // — Stage 1: Streamed critical analysis —
+      let stage1Result;
+      try {
+        stage1Result = await streamStage1(
+          cleanedText,
+          extraction.headline,
+          (_points) => {
+            // Points stream in — cards are hidden during Stage 1 per UX choice
+          }
+        );
+      } catch (streamErr) {
+        console.warn('[Read Between] Stage 1 stream failed, using fallback:', streamErr);
+        const fallback = await analyzeArticleFallback(extraction);
+        setAnalysisResult(fallback);
+        await saveLastAnalysis(fallback, extraction.url);
+        setLoading(false);
+        return;
+      }
+
+      // Compute lexical analysis locally (no API tokens)
+      const language_analysis = analyzeLanguage(cleanedText);
+
+      // Build initial AnalysisResult from Stage 1 data
+      const initialResult: AnalysisResult = {
+        article_structure,
+        structured_breakdown: { reported_points: stage1Result.reported_points },
+        sources,
+        structural_patterns: {
+          missing_context: {
+            summary: stage1Result.missing_context_summary,
+            evidence_quotes: [],
+          },
+          narrative_structure: {
+            summary: '',
+            evidence_quotes: [],
+          },
+        },
+        language_analysis,
+        author_transparency: {
+          author_name: extraction.author_name || 'Not identified',
+          publisher: extraction.publication,
+          author_page_url: extraction.author_page_url || '',
+          previous_articles: [],
+          previous_articles_state: 'not_available_from_publisher_page',
+        },
+        similar_coverage: { items: [] },
+        meta: {
+          schema_version: 'mvp-2.0',
+          generated_at: new Date().toISOString(),
+          warnings,
+        },
+      };
+
+      setAnalysisResult(initialResult);
+      setLoading(false); // UI is now interactive
+
+      // Storage write is non-blocking — don't await so setLoading(false) flushes immediately
+      saveLastAnalysis(initialResult, extraction.url).catch(console.error);
+
+      // — Stage 2 and Stage 3: run concurrently in background —
+      const cleanedTextSlice = cleanedText.substring(0, 5000);
+
+      const runStage2 = async () => {
+        setStage2Status('loading');
+        try {
+          const stage2 = await fetchStage2({
+            cleanedTextSlice,
+            reported_points: stage1Result.reported_points,
+            missing_context_summary: stage1Result.missing_context_summary,
+          });
+          setAnalysisResult((prev) => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              structural_patterns: {
+                ...prev.structural_patterns,
+                narrative_structure: {
+                  summary: stage2.narrative_structure_summary,
+                  evidence_quotes: [],
+                },
+              },
+              language_analysis: {
+                ...prev.language_analysis,
+                notable_choices: stage2.tone_notable_choices,
+              },
+            };
+          });
+          setStage2Status('done');
+        } catch (err) {
+          console.warn('[Read Between] Stage 2 failed:', err);
+          setStage2Status('error');
+        }
+      };
+
+      const runStage3 = async () => {
+        setStage3Status('loading');
+        try {
+          const items = await fetchSimilarCoverage({
+            headline: article_structure.headline,
+            publication: article_structure.publication,
+            published_date: article_structure.published_date,
+            reported_points: stage1Result.reported_points,
+            sources: sources.items,
+          });
+          setAnalysisResult((prev) => {
+            if (!prev) return prev;
+            return { ...prev, similar_coverage: { items } };
+          });
+          setStage3Status('done');
+        } catch (err) {
+          console.warn('[Read Between] Stage 3 failed:', err);
+          setStage3Status('error');
+        }
+      };
+
+      // Fire both background stages simultaneously, don't await them
+      Promise.allSettled([runStage2(), runStage3()]);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Analysis failed.'
-      );
-    } finally {
+      setError(err instanceof Error ? err.message : 'Analysis failed.');
       setLoading(false);
     }
   }, [extractFromTab]);
@@ -159,10 +296,13 @@ const Panel: React.FC = () => {
 
   const handleLoadSaved = useCallback((article: SavedArticle) => {
     setAnalysisResult(article.analysisResult);
+    setExtractionResult(null);
     setCurrentUrl(article.url);
     setAccessState({ state: article.accessState, reasons: [] });
     setArticleDetected(true);
     setError(null);
+    setStage2Status('idle');
+    setStage3Status('idle');
     setView('analysis');
   }, []);
 
@@ -173,9 +313,7 @@ const Panel: React.FC = () => {
 
   const handleCopyJson = useCallback(() => {
     if (!analysisResult) return;
-    navigator.clipboard.writeText(
-      JSON.stringify(analysisResult, null, 2)
-    );
+    navigator.clipboard.writeText(JSON.stringify(analysisResult, null, 2));
   }, [analysisResult]);
 
   const handleOpenArticle = useCallback(() => {
@@ -188,12 +326,6 @@ const Panel: React.FC = () => {
 
   return (
     <div className="panel-root">
-      {/* Header - commented out for now
-      <div className="panel-header">
-        <img src={logo} alt="Read Between" />
-      </div>
-      */}
-
       {/* Tab bar */}
       <div className="tab-bar">
         <button
@@ -214,9 +346,12 @@ const Panel: React.FC = () => {
       {view === 'analysis' ? (
         <AnalysisView
           analysisResult={analysisResult}
+          extractionResult={extractionResult}
           accessState={accessState}
           articleDetected={articleDetected}
           loading={loading}
+          stage2Status={stage2Status}
+          stage3Status={stage3Status}
           error={error}
           isCurrentSaved={isCurrentSaved}
           onAnalyze={handleAnalyze}

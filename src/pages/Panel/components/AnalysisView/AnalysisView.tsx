@@ -1,6 +1,12 @@
 import React from 'react';
-import { AnalysisResult, AccessStateResult } from '../../../../types/models';
-import SystemStatus from '../SystemStatus/SystemStatus';
+import {
+  AnalysisResult,
+  AccessStateResult,
+  ExtractionResult,
+  StageStatus,
+} from '../../../../types/models';
+import { calculateReadingTime } from '../../../../utils/textUtils';
+import { formatDate } from '../../../../utils/analyzer';
 import ArticleContext from '../ArticleContext/ArticleContext';
 import ArticleBreakdown from '../ArticleBreakdown/ArticleBreakdown';
 import SourcesSection from '../SourcesSection/SourcesSection';
@@ -15,9 +21,12 @@ import './AnalysisView.css';
 
 interface Props {
   analysisResult: AnalysisResult | null;
+  extractionResult: ExtractionResult | null;
   accessState: AccessStateResult | null;
   articleDetected: boolean;
   loading: boolean;
+  stage2Status: StageStatus;
+  stage3Status: StageStatus;
   error: string | null;
   isCurrentSaved: boolean;
   onAnalyze: () => void;
@@ -29,9 +38,12 @@ interface Props {
 
 const AnalysisView: React.FC<Props> = ({
   analysisResult,
+  extractionResult,
   accessState,
   articleDetected,
   loading,
+  stage2Status,
+  stage3Status,
   error,
   isCurrentSaved,
   onAnalyze,
@@ -40,10 +52,23 @@ const AnalysisView: React.FC<Props> = ({
   onCopyJson,
   onOpenArticle,
 }) => {
+  // Build a preview ArticleStructure from extraction data for early display
+  const previewStructure = extractionResult
+    ? {
+        headline: extractionResult.headline || 'No headline detected',
+        publication: extractionResult.publication,
+        published_date: formatDate(extractionResult.published_date),
+        reading_time: calculateReadingTime(extractionResult.wordCount),
+      }
+    : null;
+
+  // Use actual result when available; fall back to extraction preview during Stage 1
+  const contextStructure = analysisResult?.article_structure ?? previewStructure;
+
   return (
     <div className="analysis-view">
 
-      {!analysisResult && !loading && (
+      {!articleDetected && !loading && (
         <div className="analysis-empty">
           <img src={logo} alt="Read Between" className="analysis-logo" />
           <p className="analysis-tagline">
@@ -65,18 +90,19 @@ const AnalysisView: React.FC<Props> = ({
         </div>
       )}
 
+      {/* Show ArticleContext as soon as structure data is available */}
+      {contextStructure && (articleDetected || loading) && (
+        <ArticleContext structure={contextStructure} />
+      )}
+
       {loading && (
         <div className="analysis-loading">
-          Analyzing article...
+          Analyzing article…
         </div>
       )}
 
       {analysisResult && !loading && (
         <>
-          <ArticleContext
-            structure={analysisResult.article_structure}
-          />
-
           <CollapsibleCard id="summary-card" title="What's Being Reported" titleClassName="section-title">
             <ArticleBreakdown breakdown={analysisResult.structured_breakdown} />
           </CollapsibleCard>
@@ -90,11 +116,17 @@ const AnalysisView: React.FC<Props> = ({
           </CollapsibleCard>
 
           <CollapsibleCard id="narrative-card" title="How the Story Is Structured" titleClassName="section-title white-title" defaultOpen={false} variant="dark">
-            <NarrativeStructureCard narrativeStructure={analysisResult.structural_patterns.narrative_structure} />
+            <NarrativeStructureCard
+              narrativeStructure={analysisResult.structural_patterns.narrative_structure}
+              isLoading={stage2Status === 'loading'}
+            />
           </CollapsibleCard>
 
           <CollapsibleCard title="Tone Indicators" titleClassName="section-title white-title" defaultOpen={false} variant="dark">
-            <ToneIndicatorsCard languageAnalysis={analysisResult.language_analysis} />
+            <ToneIndicatorsCard
+              languageAnalysis={analysisResult.language_analysis}
+              isLoading={stage2Status === 'loading'}
+            />
           </CollapsibleCard>
 
           <CollapsibleCard id="author-card" title="Author Transparency" titleClassName="section-title white-title" defaultOpen={false} variant="dark">
@@ -102,7 +134,10 @@ const AnalysisView: React.FC<Props> = ({
           </CollapsibleCard>
 
           <CollapsibleCard id="coverage-card" title="Find Similar Coverage" titleClassName="section-title white-title" defaultOpen={false} variant="dark">
-            <SimilarCoverage analysisResult={analysisResult} />
+            <SimilarCoverage
+              analysisResult={analysisResult}
+              stage3Status={stage3Status}
+            />
           </CollapsibleCard>
 
           {/* Notices / Warnings */}

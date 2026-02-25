@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { SimilarCoverageItem, AnalysisResult } from '../types/models';
+import { SimilarCoverageItem, SourceItem } from '../types/models';
 
 const similarCoverageSchema = {
   type: 'object' as const,
@@ -32,37 +32,38 @@ const similarCoverageSchema = {
   additionalProperties: false,
 };
 
-function extractEntitiesFromAnalysis(analysis: AnalysisResult): string[] {
-  const textParts = [
-    analysis.article_structure.headline,
-    ...analysis.structured_breakdown.reported_points,
-  ];
-  const fullText = textParts.join(' ');
-
-  const entityPattern = /(?:[A-Z][a-z]+ ){1,3}[A-Z][a-z]+/g;
-  const matches: string[] = fullText.match(entityPattern) || [];
-
-  const sourceNames = analysis.sources.items.map((s) => s.source_name);
-  const all: string[] = matches.concat(sourceNames);
-  const seen: Record<string, boolean> = {};
-  const unique = all.filter(function (item) {
-    if (seen[item]) return false;
-    seen[item] = true;
-    return true;
-  });
-  return unique.slice(0, 8);
+interface SimilarCoverageContext {
+  headline: string;
+  publication: string;
+  published_date: string;
+  reported_points: string[];
+  sources: SourceItem[];
 }
 
-function buildEventSummary(analysis: AnalysisResult): string {
-  const points = analysis.structured_breakdown.reported_points;
-  if (points.length >= 2) {
-    return points.slice(0, 2).join(' ');
-  }
-  return points[0] || analysis.article_structure.headline;
+function extractEntities(context: SimilarCoverageContext): string[] {
+  const fullText = [context.headline, ...context.reported_points].join(' ');
+  const entityPattern = /(?:[A-Z][a-z]+ ){1,3}[A-Z][a-z]+/g;
+  const matches: string[] = fullText.match(entityPattern) || [];
+  const sourceNames = context.sources.map((s) => s.source_name);
+  const all = [...matches, ...sourceNames];
+  const seen: Record<string, boolean> = {};
+  return all
+    .filter((item) => {
+      if (seen[item]) return false;
+      seen[item] = true;
+      return true;
+    })
+    .slice(0, 8);
+}
+
+function buildEventSummary(context: SimilarCoverageContext): string {
+  const points = context.reported_points;
+  if (points.length >= 2) return points.slice(0, 2).join(' ');
+  return points[0] || context.headline;
 }
 
 export async function fetchSimilarCoverage(
-  analysis: AnalysisResult
+  context: SimilarCoverageContext
 ): Promise<SimilarCoverageItem[]> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -74,11 +75,8 @@ export async function fetchSimilarCoverage(
     dangerouslyAllowBrowser: true,
   });
 
-  const headline = analysis.article_structure.headline;
-  const publisher = analysis.article_structure.publication;
-  const date = analysis.article_structure.published_date;
-  const entities = extractEntitiesFromAnalysis(analysis);
-  const eventSummary = buildEventSummary(analysis);
+  const entities = extractEntities(context);
+  const eventSummary = buildEventSummary(context);
 
   const response = await client.responses.create({
     model: 'gpt-4.1',
@@ -110,9 +108,9 @@ Other rules:
             type: 'input_text',
             text: `
 Input article:
-- Headline: ${headline}
-- Publisher: ${publisher}
-- Date: ${date}
+- Headline: ${context.headline}
+- Publisher: ${context.publication}
+- Date: ${context.published_date}
 - Key entities: ${entities.join(', ')}
 - Event summary (1-2 sentences): ${eventSummary}
 
@@ -134,7 +132,7 @@ Return only articles you found via search with their exact URLs.
     },
   });
 
-  // Also extract URLs from web search annotations as a fallback/verification
+  // Cross-reference annotation URLs as verification
   const annotationUrls: Record<string, string> = {};
   for (const item of response.output) {
     if (item.type === 'message' && 'content' in item) {
@@ -153,19 +151,14 @@ Return only articles you found via search with their exact URLs.
   const parsed = JSON.parse(response.output_text);
   const articles = parsed.articles as SimilarCoverageItem[];
 
-  // Cross-reference: if an annotation URL matches a headline, prefer the annotation URL
-  return articles.map(function (article) {
+  return articles.map((article) => {
     const headlineLower = article.headline.toLowerCase();
-    for (var key in annotationUrls) {
+    for (const key in annotationUrls) {
       if (
         headlineLower.indexOf(key) !== -1 ||
         key.indexOf(headlineLower) !== -1
       ) {
-        return {
-          publisher: article.publisher,
-          headline: article.headline,
-          url: annotationUrls[key],
-        };
+        return { publisher: article.publisher, headline: article.headline, url: annotationUrls[key] };
       }
     }
     return article;

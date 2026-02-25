@@ -131,6 +131,20 @@ export interface SavedArticle {
   analysisResult: AnalysisResult;
 }
 
+// ========== Staged Analysis Types ==========
+
+export interface Stage1Response {
+  reported_points: string[];       // exactly 4 concise bullets
+  missing_context_summary: string; // 1-3 sentences
+}
+
+export interface Stage2Response {
+  narrative_structure_summary: string; // 2-4 sentences
+  tone_notable_choices: string[];      // 1-3 observations
+}
+
+export type StageStatus = 'idle' | 'loading' | 'done' | 'error';
+
 // ========== Message Types ==========
 
 export interface ExtractMessage {

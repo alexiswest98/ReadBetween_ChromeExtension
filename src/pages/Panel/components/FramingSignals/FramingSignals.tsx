@@ -40,9 +40,14 @@ export const MissingContextCard: React.FC<MissingContextProps> = ({ missingConte
 
 interface NarrativeStructureProps {
   narrativeStructure: StructuralPatternSection;
+  isLoading?: boolean;
 }
 
-export const NarrativeStructureCard: React.FC<NarrativeStructureProps> = ({ narrativeStructure }) => {
+export const NarrativeStructureCard: React.FC<NarrativeStructureProps> = ({ narrativeStructure, isLoading }) => {
+  if (isLoading) {
+    return <p className="card-loading-hint">Analyzing structure and tone…</p>;
+  }
+
   const sentences = narrativeStructure.summary
     .split(/(?<=\.)\s+(?=[A-Z])/)
     .filter((s) => s.trim().length > 0);
@@ -89,9 +94,14 @@ const LanguageStat: React.FC<{ label: string; count: number; words: string[] }> 
 
 interface ToneIndicatorsProps {
   languageAnalysis: LanguageAnalysis;
+  isLoading?: boolean;
 }
 
-export const ToneIndicatorsCard: React.FC<ToneIndicatorsProps> = ({ languageAnalysis }) => {
+export const ToneIndicatorsCard: React.FC<ToneIndicatorsProps> = ({ languageAnalysis, isLoading }) => {
+  if (isLoading) {
+    return <p className="card-loading-hint">Analyzing structure and tone…</p>;
+  }
+
   return (
     <>
       {languageAnalysis.notable_choices.length > 0 && (
