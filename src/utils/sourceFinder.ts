@@ -216,6 +216,9 @@ function tryAttributionPatterns(
       // Reject single-token matches — too noisy (e.g. "Council", "Administration")
       // unless the name is a well-known single-name figure
       if (name.split(/\s+/).length === 1 && !SINGLE_NAME_ALLOWLIST.has(nameLower)) continue;
+      // Reject names containing possessive tokens (e.g. "Trump's", "NPR's")
+      // apostrophe-s signals ownership, not a person/agency name
+      if (name.split(/\s+/).some(t => /[''\u2019]s$/i.test(t))) continue;
 
       // Reclassify org-sounding names (e.g. "Baker Institute") as agency
       const resolvedType: SourceType =

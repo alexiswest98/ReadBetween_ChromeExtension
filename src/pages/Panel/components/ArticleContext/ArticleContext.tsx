@@ -15,8 +15,8 @@ const ArticleContext: React.FC<Props> = ({ structure }) => {
         <h1 className="context-headline">{structure.headline}</h1>
         <span>{structure.published_date}</span>
       </div>
-      <div className='reading-meta'> 
-        <span className='reading-time-txt'>{structure.reading_time}</span>
+      <div className='reading-meta'>
+        <h3 className='reading-time-txt'>{structure.reading_time}</h3>
       </div>
     </div>
   );

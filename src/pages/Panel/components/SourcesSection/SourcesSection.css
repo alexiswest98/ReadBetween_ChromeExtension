@@ -40,6 +40,14 @@
 .source-quote {
   margin: 2px 0;
   font-size: 0.7rem;
+  color: #000000;
+  font-style: italic;
+}
+
+.source-disclaimer {
+  margin-top: 8px;
+  font-size: 0.625rem;
   color: #313131;
   font-style: italic;
+  text-align: center;
 }

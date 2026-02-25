@@ -1,149 +1,183 @@
+# Media Framing & Coverage Analyzer
+A UX-driven Chrome extension that analyzes online news articles to surface framing patterns, language signals, and alternative coverage perspectives.
 
-# Chrome Extension (MV3) Boilerplate with React 18 and Webpack 5
-
-[![npm](https://img.shields.io/npm/v/chrome-extension-boilerplate-react)](https://www.npmjs.com/package/chrome-extension-boilerplate-react)
-[![npm-download](https://img.shields.io/npm/dw/chrome-extension-boilerplate-react)](https://www.npmjs.com/package/chrome-extension-boilerplate-react)
-[![npm](https://img.shields.io/npm/dm/chrome-extension-boilerplate-react)](https://www.npmjs.com/package/chrome-extension-boilerplate-react)
-
-## Announcements
-
-- Recently updated from **[React](https://reactjs.org)** ~~17~~ to **18**!
-- **_This boilerplate adopts [Manifest V3](https://developer.chrome.com/docs/extensions/mv3/intro/mv3-overview/)!_**
-  - For V2 users, please check out the [manifest-v2](https://github.com/lxieyang/chrome-extension-boilerplate-react/tree/manifest-v2) branch, or use version [3.x](https://www.npmjs.com/package/chrome-extension-boilerplate-react/v/3.3.0).
-  - Check out the [Manifest V3 Migration Guide](https://developer.chrome.com/docs/extensions/mv3/intro/mv3-migration/).
-- Recently added [devtools](https://developer.chrome.com/docs/extensions/mv3/devtools/) Support! Thanks [GeekaholicLin](https://github.com/lxieyang/chrome-extension-boilerplate-react/issues/17)!
-- Recently updated from **[Webpack Dev Server](https://webpack.js.org/configuration/dev-server/)** ~~3.x~~ to **4.x** and **[Webpack](https://webpack.js.org/)** ~~4~~ to **5**!
-- Recently added [TypeScript](https://www.typescriptlang.org/) Support!
-
-## Features
-
-This is a basic Chrome Extensions boilerplate to help you write modular and modern Javascript code, load CSS easily and [automatic reload the browser on code changes](https://webpack.github.io/docs/webpack-dev-server.html#automatic-refresh).
-
-This boilerplate is updated with:
-
-- [Chrome Extension Manifest V3](https://developer.chrome.com/docs/extensions/mv3/intro/mv3-overview/)
-- [React 18](https://reactjs.org)
-- [Webpack 5](https://webpack.js.org/)
-- [Webpack Dev Server 4](https://webpack.js.org/configuration/dev-server/)
-- [React Refresh](https://www.npmjs.com/package/react-refresh)
-- [react-refresh-webpack-plugin](https://github.com/pmmmwh/react-refresh-webpack-plugin)
-- [eslint-config-react-app](https://www.npmjs.com/package/eslint-config-react-app)
-- [Prettier](https://prettier.io/)
-- [TypeScript](https://www.typescriptlang.org/)
-
-This boilerplate is heavily inspired by and adapted from [https://github.com/samuelsimoes/chrome-extension-webpack-boilerplate](https://github.com/samuelsimoes/chrome-extension-webpack-boilerplate), with additional support for React 18 features, Webpack 5, and Webpack Dev Server 4.
-
-Please open up an issue to nudge me to keep the npm packages up-to-date. FYI, it takes time to make different packages with different versions work together nicely.
-
-## Installing and Running
-
-### Procedures:
-
-1. Check if your [Node.js](https://nodejs.org/) version is >= **18**.
-2. Clone this repository.
-3. Change the package's `name`, `description`, and `repository` fields in `package.json`.
-4. Change the name of your extension on `src/manifest.json`.
-5. Run `npm install` to install the dependencies.
-6. Run `npm start`
-7. Load your extension on Chrome following:
-   1. Access `chrome://extensions/`
-   2. Check `Developer mode`
-   3. Click on `Load unpacked extension`
-   4. Select the `build` folder.
-8. Happy hacking.
-
-## Structure
-
-All your extension's code must be placed in the `src` folder.
-
-The boilerplate is already prepared to have a popup, an options page, a background page, and a new tab page (which replaces the new tab page of your browser). But feel free to customize these.
-
-## TypeScript
-
-This boilerplate now supports TypeScript! The `Options` Page is implemented using TypeScript. Please refer to `src/pages/Options/` for example usages.
-
-## Webpack auto-reload and HRM
-
-To make your workflow much more efficient this boilerplate uses the [webpack server](https://webpack.github.io/docs/webpack-dev-server.html) to development (started with `npm start`) with auto reload feature that reloads the browser automatically every time that you save some file in your editor.
-
-You can run the dev mode on other port if you want. Just specify the env var `port` like this:
-
-```
-$ PORT=6002 npm run start
-```
-
-## Content Scripts
-
-Although this boilerplate uses the webpack dev server, it's also prepared to write all your bundles files on the disk at every code change, so you can point, on your extension manifest, to your bundles that you want to use as [content scripts](https://developer.chrome.com/extensions/content_scripts), but you need to exclude these entry points from hot reloading [(why?)](https://github.com/samuelsimoes/chrome-extension-webpack-boilerplate/issues/4#issuecomment-261788690). To do so you need to expose which entry points are content scripts on the `webpack.config.js` using the `chromeExtensionBoilerplate -> notHotReload` config. Look the example below.
-
-Let's say that you want use the `myContentScript` entry point as content script, so on your `webpack.config.js` you will configure the entry point and exclude it from hot reloading, like this:
-
-```js
-{
-  …
-  entry: {
-    myContentScript: "./src/js/myContentScript.js"
-  },
-  chromeExtensionBoilerplate: {
-    notHotReload: ["myContentScript"]
-  }
-  …
-}
-```
-
-and on your `src/manifest.json`:
-
-```json
-{
-  "content_scripts": [
-    {
-      "matches": ["https://www.google.com/*"],
-      "js": ["myContentScript.bundle.js"]
-    }
-  ]
-}
-```
-
-## Intelligent Code Completion
-
-Thanks to [@hudidit](https://github.com/lxieyang/chrome-extension-boilerplate-react/issues/4)'s kind suggestions, this boilerplate supports chrome-specific intelligent code completion using [@types/chrome](https://www.npmjs.com/package/@types/chrome).
-
-## Packing
-
-After the development of your extension run the command
-
-```
-$ NODE_ENV=production npm run build
-```
-
-Now, the content of `build` folder will be the extension ready to be submitted to the Chrome Web Store. Just take a look at the [official guide](https://developer.chrome.com/webstore/publish) to more infos about publishing.
-
-## Secrets
-
-If you are developing an extension that talks with some API you probably are using different keys for testing and production. Is a good practice you not commit your secret keys and expose to anyone that have access to the repository.
-
-To this task this boilerplate import the file `./secrets.<THE-NODE_ENV>.js` on your modules through the module named as `secrets`, so you can do things like this:
-
-_./secrets.development.js_
-
-```js
-export default { key: '123' };
-```
-
-_./src/popup.js_
-
-```js
-import secrets from 'secrets';
-ApiCall({ key: secrets.key });
-```
-
-:point_right: The files with name `secrets.*.js` already are ignored on the repository.
-
-## Resources:
-
-- [Webpack documentation](https://webpack.js.org/concepts/)
-- [Chrome Extension documentation](https://developer.chrome.com/extensions/getstarted)
+Built as a product-focused case study demonstrating UX strategy, information architecture, API integration, and decision-making under technical constraints.
 
 ---
 
-Michael Xieyang Liu | [Website](https://lxieyang.github.io)
+## Product Overview
+
+The Media Framing & Coverage Analyzer is a Chrome extension that activates on news article pages and provides structured analysis across key narrative dimensions:
+
+- Framing & tone indicators
+- Agency and responsibility attribution
+- Explanation balance
+- Language intensity signals
+- Missing contextual elements
+- Similar coverage from different publishers
+- Save-for-later functionality
+
+Rather than labeling content as “biased,” the tool presents analytical signals in a neutral, structured format that supports informed interpretation.
+
+---
+
+## Problem
+
+Modern news consumption is fast, reactive, and fragmented.
+
+Readers often:
+- Lack visibility into framing language
+- Struggle to compare coverage angles
+- Cannot easily detect narrative emphasis
+- Have limited tools for structured critical analysis
+
+Most bias tools oversimplify journalism into political binaries. There is an opportunity to create a calmer, more analytical reading aid.
+
+---
+
+## Solution
+
+Design a lightweight Chrome extension that:
+
+1. Detects article pages automatically
+2. Extracts readable article text
+3. Sends content to an analysis API
+4. Organizes results into structured UX modules
+5. Surfaces three similar articles from different publishers
+6. Allows users to save articles for future comparison
+
+The experience prioritizes:
+- Scannability
+- Neutral tone
+- Structured insights
+- Transparent system feedback
+- Clear loading and error states
+
+---
+
+## UX Strategy
+
+### 1. Information Architecture
+[ Chrome Extension Entry ]
+
+├── Primary View: Article Analysis
+│ ├── System Status
+│ ├── Framing Indicators
+│ ├── Agency & Responsibility
+│ ├── Explanation Balance
+│ ├── Language Signals
+│ └── Missing Context
+│
+└── Secondary View: Saved Articles
+├── Saved List
+└── Reanalyze / Remove
+
+
+**Design Rationale:**
+- Modular categories improve cognitive processing
+- Collapsible sections reduce overwhelm
+- Clear hierarchy supports quick scanning
+- Consistent structure creates product trust
+
+---
+
+### 2. Interaction Design Principles
+
+- Calm, neutral visual palette (avoids political color bias)
+- Status transparency (loading, analyzing, errors)
+- Structured analytical modules
+- No gamification or score-based shaming
+- Designed for credibility over virality
+
+---
+
+### 3. Tradeoffs & Product Decisions
+
+As a portfolio SaaS case study, I intentionally balanced:
+
+- Data precision vs. product clarity
+- API cost vs. depth of analysis
+- Performance vs. comprehensiveness
+- Technical feasibility vs. UX integrity
+
+For this iteration, UX structure and product clarity were prioritized over perfect data accuracy, reflecting real-world MVP constraints.
+
+---
+
+## Technical Implementation
+
+**Stack**
+- React
+- JavaScript (ES6+)
+- Chrome Extension Manifest V3
+- Webpack
+- External NLP / analysis API
+- Article similarity API
+
+**Key Engineering Considerations**
+- Content script isolation
+- Asynchronous API calls
+- Error handling for paywalled content
+- Article extraction inconsistencies
+- Performance constraints within extension environment
+- Build alignment between root and output folders
+
+---
+
+## System States
+
+The extension accounts for multiple states:
+
+- Article detected
+- Analyzing content
+- Full analysis available
+- Partial data returned
+- API error
+- No article detected
+- Saved article view
+
+Designing robust system states was critical for product trust and usability.
+
+---
+
+## Design & Product Insights
+
+- UX-first product thinking
+- Information architecture design
+- Complex data simplification
+- API-driven interface design
+- Edge case handling
+- Constraint-based decision making
+- Clear modular UI systems
+- MVP prioritization strategy
+- Chrome extension architecture
+
+---
+
+## Installation
+
+1. Clone the repository  
+2. Install dependencies:
+
+   npm install
+
+3. Build the extension:
+
+   npm run build
+
+4. Open Chrome → Extensions  
+5. Enable “Developer Mode”  
+6. Click “Load Unpacked”  
+7. Select the `/build` directory  
+
+---
+
+## Future Iterations
+
+- Improved NLP classification logic
+- Caching layer to reduce API calls
+- Side-by-side publisher comparison view
+- Visualized framing differences
+- Adjustable analysis depth
+- User testing validation
+- Analytics instrumentation
