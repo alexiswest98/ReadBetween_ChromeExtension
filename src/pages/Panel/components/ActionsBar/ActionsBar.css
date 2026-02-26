@@ -7,7 +7,7 @@
 .actions-buttons {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
+  justify-content: space-between;
   /* margin-top: 12px; */
 }
 

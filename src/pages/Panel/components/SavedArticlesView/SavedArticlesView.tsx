@@ -22,7 +22,7 @@ const SavedArticlesView: React.FC<Props> = ({
   if (articles.length === 0) {
     return (
       <div className="saved-empty">
-        <p className="saved-empty-title">No saved articles yet</p>
+        <h2 className="saved-empty-title">No saved articles yet</h2>
         <p className="saved-empty-subtitle">
           Articles you save will appear here.
         </p>
@@ -34,13 +34,13 @@ const SavedArticlesView: React.FC<Props> = ({
     <div className="saved-list">
       {articles.map((article) => (
         <div key={article.id} className="card">
-          <h4 className="saved-card-title">{article.headline}</h4>
+          <h3 className="saved-card-title">{article.headline}</h3>
           <div className="saved-card-meta">
             <span>{article.publisher}</span>
             <span>
               {new Date(article.savedAt).toLocaleDateString()}
             </span>
-            <span>{accessLabels[article.accessState]}</span>
+            {/* <span>{accessLabels[article.accessState]}</span> */}
           </div>
           <div className="saved-card-actions">
             <button

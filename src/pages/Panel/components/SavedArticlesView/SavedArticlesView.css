@@ -2,15 +2,21 @@
   padding: 48px 16px;
   text-align: center;
   color: #888888;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 91vh;
 }
 
 .saved-empty-title {
-  font-size: 0.875rem;
-  margin-bottom: 4px;
+  margin-block-start: 0em;
+  margin-block-end: 0.3em;
+  color: #DBDCF1;
 }
 
 .saved-empty-subtitle {
   font-size: 0.75rem;
+  margin-block-start: 0.2em;
 }
 
 .saved-list {
@@ -35,7 +41,8 @@
 
 .saved-card-actions {
   display: flex;
-  gap: 8px;
+  gap: 20px;
+  margin-top: 10px;
 }
 
 .small-button {
@@ -46,6 +53,7 @@
   cursor: pointer;
   font-size: 0.6875rem;
   color: #ccc;
+  box-shadow: 0 1px 3px rgba(255, 255, 255, 0.3);
 }
 
 .small-button.remove {
