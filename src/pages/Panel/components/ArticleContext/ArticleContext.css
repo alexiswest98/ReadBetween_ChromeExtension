@@ -17,6 +17,8 @@
 .context-meta {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
+  width: -webkit-fill-available;
   /* gap: 4px; */
   /* font-size: 0.75rem; */
   color: #888888;

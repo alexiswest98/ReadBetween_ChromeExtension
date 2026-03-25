@@ -1,6 +1,30 @@
 import OpenAI from 'openai';
 import { SimilarCoverageItem, SourceItem } from '../types/models';
 
+const BLOCKED_DOMAINS = [
+  'reddit.com',
+  'twitter.com',
+  'x.com',
+  'facebook.com',
+  'yahoo.com',
+  'news.yahoo.com',
+  'msn.com',
+  'apple.news',
+];
+
+function isBlockedDomain(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname.replace('www.', '');
+    return BLOCKED_DOMAINS.some((blocked) => hostname.includes(blocked));
+  } catch {
+    return true; // reject invalid URLs
+  }
+}
+
+function normalize(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 const similarCoverageSchema = {
   type: 'object' as const,
   properties: {
@@ -9,19 +33,9 @@ const similarCoverageSchema = {
       items: {
         type: 'object' as const,
         properties: {
-          publisher: {
-            type: 'string' as const,
-            description: 'The name of the news publisher',
-          },
-          headline: {
-            type: 'string' as const,
-            description: 'The exact headline as it appears on the page',
-          },
-          url: {
-            type: 'string' as const,
-            description:
-              'The exact URL copied from the web search result. Must be a real, working link.',
-          },
+          publisher: { type: 'string' as const },
+          headline: { type: 'string' as const },
+          url: { type: 'string' as const },
         },
         required: ['publisher', 'headline', 'url'] as const,
         additionalProperties: false,
@@ -45,33 +59,29 @@ function extractEntities(context: SimilarCoverageContext): string[] {
   const entityPattern = /(?:[A-Z][a-z]+ ){1,3}[A-Z][a-z]+/g;
   const matches: string[] = fullText.match(entityPattern) || [];
   const sourceNames = context.sources.map((s) => s.source_name);
-  const all = [...matches, ...sourceNames];
-  const seen: Record<string, boolean> = {};
-  return all
+
+  const seen = new Set<string>();
+  return [...matches, ...sourceNames]
     .filter((item) => {
-      if (seen[item]) return false;
-      seen[item] = true;
+      if (seen.has(item)) return false;
+      seen.add(item);
       return true;
     })
     .slice(0, 8);
 }
 
 function buildEventSummary(context: SimilarCoverageContext): string {
-  const points = context.reported_points;
-  if (points.length >= 2) return points.slice(0, 2).join(' ');
-  return points[0] || context.headline;
+  if (context.reported_points.length >= 2) {
+    return context.reported_points.slice(0, 2).join(' ');
+  }
+  return context.reported_points[0] || context.headline;
 }
 
 export async function fetchSimilarCoverage(
   context: SimilarCoverageContext
 ): Promise<SimilarCoverageItem[]> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error('OpenAI API key not configured.');
-  }
-
   const client = new OpenAI({
-    apiKey,
+    apiKey: process.env.OPENAI_API_KEY,
     dangerouslyAllowBrowser: true,
   });
 
@@ -82,24 +92,38 @@ export async function fetchSimilarCoverage(
     model: 'gpt-4.1',
     tools: [{ type: 'web_search' }],
     tool_choice: { type: 'web_search' } as any,
+
     instructions: `
 You are helping populate "Find Similar Coverage" for a news-analysis product.
 
-Goal:
-Find 3 news articles from 3 different publishers that report on the same underlying event/topic as the input article.
+GOAL:
+Find up to 3 articles from different publishers covering the same event.
 
-CRITICAL RULES FOR URLs:
-- Every URL you return MUST be copied exactly from your web search results.
-- DO NOT fabricate, guess, or reconstruct URLs. Only use URLs you actually found via search.
-- If you cannot find 3 real articles with real URLs, return fewer rather than inventing URLs.
+STRICT TOOL REQUIREMENT:
+- You MUST only return URLs that appear in the web_search tool results.
+- Each result MUST correspond to a cited search result.
+- NEVER include a URL that was not returned by the tool.
 
-Other rules:
-- Publishers must be different from each other and from the input publisher.
-- No syndication reposts (same article on different domains).
-- Prefer straight news reporting over opinion pieces or aggregators.
-- Each result must cover the same event/topic as the input article.
-- Use the exact headline as it appears on the publisher's page.
+URL RULES:
+- URLs must load successfully and link directly to the article.
+- No homepages, category pages, or redirects.
+
+SOURCE RULES:
+- Only established news publishers
+- NO aggregators, social platforms, blogs
+
+PUBLISHER RULES:
+- All publishers must be unique
+- Must differ from the input article's publisher
+
+FAILURE RULE:
+- It is expected you may return fewer than 3 results.
+- Return an empty list if nothing valid is found.
+
+SELF CHECK:
+If a result is not directly supported by a tool citation → discard it.
 `.trim(),
+
     input: [
       {
         role: 'user',
@@ -111,17 +135,18 @@ Input article:
 - Headline: ${context.headline}
 - Publisher: ${context.publication}
 - Date: ${context.published_date}
-- Key entities: ${entities.join(', ')}
-- Event summary (1-2 sentences): ${eventSummary}
+- Entities: ${entities.join(', ')}
+- Summary: ${eventSummary}
 
 Task:
-Search the web for 3 other publishers reporting on this same event/topic.
-Return only articles you found via search with their exact URLs.
+Find matching coverage from other publishers using web search.
+Return ONLY verified results.
             `.trim(),
           },
         ],
       },
     ],
+
     text: {
       format: {
         type: 'json_schema',
@@ -132,15 +157,16 @@ Return only articles you found via search with their exact URLs.
     },
   });
 
-  // Cross-reference annotation URLs as verification
-  const annotationUrls: Record<string, string> = {};
+  // 🔍 Extract tool-verified URLs
+  const annotationUrls = new Set<string>();
+
   for (const item of response.output) {
     if (item.type === 'message' && 'content' in item) {
       for (const block of item.content) {
         if ('annotations' in block) {
           for (const ann of (block as any).annotations || []) {
-            if (ann.type === 'url_citation' && ann.url && ann.title) {
-              annotationUrls[ann.title.toLowerCase()] = ann.url;
+            if (ann.type === 'url_citation' && ann.url) {
+              annotationUrls.add(ann.url);
             }
           }
         }
@@ -151,16 +177,27 @@ Return only articles you found via search with their exact URLs.
   const parsed = JSON.parse(response.output_text);
   const articles = parsed.articles as SimilarCoverageItem[];
 
-  return articles.map((article) => {
-    const headlineLower = article.headline.toLowerCase();
-    for (const key in annotationUrls) {
-      if (
-        headlineLower.indexOf(key) !== -1 ||
-        key.indexOf(headlineLower) !== -1
-      ) {
-        return { publisher: article.publisher, headline: article.headline, url: annotationUrls[key] };
-      }
+  const seenPublishers = new Set<string>();
+
+  const verified = articles.filter((article) => {
+    // Must exist in tool results
+    if (!annotationUrls.has(article.url)) return false;
+
+    // Block bad domains
+    if (isBlockedDomain(article.url)) return false;
+
+    // Unique publishers
+    const publisherKey = normalize(article.publisher);
+    if (seenPublishers.has(publisherKey)) return false;
+    seenPublishers.add(publisherKey);
+
+    // Must not match input publisher
+    if (normalize(article.publisher) === normalize(context.publication)) {
+      return false;
     }
-    return article;
+
+    return true;
   });
+
+  return verified.slice(0, 3);
 }

@@ -86,5 +86,6 @@
 .paywall-notice-text {
   font-size: 0.75rem;
   font-style: italic;
-  color: #333;
+  color: #e74c3c;
+  text-align: center;
 }

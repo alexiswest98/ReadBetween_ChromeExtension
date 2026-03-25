@@ -110,7 +110,7 @@ const AnalysisView: React.FC<Props> = ({
             }} />
           </CollapsibleCard>
 
-          <CollapsibleCard id="coverage-card" title="Find Similar Coverage" titleClassName="section-title white-title" defaultOpen={false} variant="dark">
+          <CollapsibleCard id="coverage-card" title="Find Similar Coverage" titleClassName="section-title white-title" defaultOpen={true} variant="dark">
             <SimilarCoverage
               analysisResult={analysisResult}
               stage3Status={stage3Status}
