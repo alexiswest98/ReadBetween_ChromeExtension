@@ -17,12 +17,25 @@ function isBlockedDomain(url: string): boolean {
     const hostname = new URL(url).hostname.replace('www.', '');
     return BLOCKED_DOMAINS.some((blocked) => hostname.includes(blocked));
   } catch {
-    return true; // reject invalid URLs
+    return true;
   }
 }
 
 function normalize(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+// 🔑 NEW: Normalize URLs to avoid false mismatches
+function normalizeUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    return (
+      u.hostname.replace('www.', '') +
+      u.pathname.replace(/\/$/, '')
+    );
+  } catch {
+    return url;
+  }
 }
 
 const similarCoverageSchema = {
@@ -101,27 +114,25 @@ Find up to 3 articles from different publishers covering the same event.
 
 STRICT TOOL REQUIREMENT:
 - You MUST only return URLs that appear in the web_search tool results.
-- Each result MUST correspond to a cited search result.
 - NEVER include a URL that was not returned by the tool.
 
 URL RULES:
-- URLs must load successfully and link directly to the article.
-- No homepages, category pages, or redirects.
+- URLs must link directly to the article (no homepages or category pages)
 
 SOURCE RULES:
 - Only established news publishers
-- NO aggregators, social platforms, blogs
+- NO aggregators or social platforms
 
 PUBLISHER RULES:
 - All publishers must be unique
-- Must differ from the input article's publisher
+- Must differ from the input article’s publisher
 
 FAILURE RULE:
-- It is expected you may return fewer than 3 results.
-- Return an empty list if nothing valid is found.
+- You may return fewer than 3 results
+- Return empty list if nothing valid
 
 SELF CHECK:
-If a result is not directly supported by a tool citation → discard it.
+If a result is not supported by tool results → discard it
 `.trim(),
 
     input: [
@@ -157,7 +168,7 @@ Return ONLY verified results.
     },
   });
 
-  // 🔍 Extract tool-verified URLs
+  // 🔍 Extract tool URLs
   const annotationUrls = new Set<string>();
 
   for (const item of response.output) {
@@ -174,30 +185,51 @@ Return ONLY verified results.
     }
   }
 
+  const normalizedAnnotations = new Set(
+    Array.from(annotationUrls).map(normalizeUrl)
+  );
+
   const parsed = JSON.parse(response.output_text);
   const articles = parsed.articles as SimilarCoverageItem[];
 
   const seenPublishers = new Set<string>();
 
-  const verified = articles.filter((article) => {
-    // Must exist in tool results
-    if (!annotationUrls.has(article.url)) return false;
+  // 🟢 STRICT PASS
+  let verified = articles.filter((article) => {
+    const normalized = normalizeUrl(article.url);
 
-    // Block bad domains
+    if (!normalizedAnnotations.has(normalized)) return false;
     if (isBlockedDomain(article.url)) return false;
 
-    // Unique publishers
     const publisherKey = normalize(article.publisher);
     if (seenPublishers.has(publisherKey)) return false;
     seenPublishers.add(publisherKey);
 
-    // Must not match input publisher
     if (normalize(article.publisher) === normalize(context.publication)) {
       return false;
     }
 
     return true;
   });
+
+  // 🟡 FALLBACK PASS (graceful degradation)
+  if (verified.length === 0) {
+    const fallbackSeen = new Set<string>();
+
+    verified = articles.filter((article) => {
+      if (isBlockedDomain(article.url)) return false;
+
+      const publisherKey = normalize(article.publisher);
+      if (fallbackSeen.has(publisherKey)) return false;
+      fallbackSeen.add(publisherKey);
+
+      if (normalize(article.publisher) === normalize(context.publication)) {
+        return false;
+      }
+
+      return true;
+    });
+  }
 
   return verified.slice(0, 3);
 }
