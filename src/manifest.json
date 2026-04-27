@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Read Between BETA",
-  "description": "AI-powered news literacy tool that helps you read between the lines. THIS EXTENSION IS FOR BETA TESTING",
+  "name": "Read Between",
+  "description": "AI-powered news literacy tool that helps you read between the lines.",
   "version": "1.0.0",
   "background": {
     "service_worker": "background.bundle.js"
@@ -35,13 +35,10 @@
       ]
     }
   ],
-  "devtools_page": "devtools.html",
-  "web_accessible_resources": [
+"web_accessible_resources": [
     {
       "resources": [
-        "content.styles.css",
-        "icon-128.png",
-        "icon-34.png"
+        "content.styles.css"
       ],
       "matches": [
         "<all_urls>"
