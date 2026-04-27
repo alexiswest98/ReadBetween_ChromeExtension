@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Read Between",
-  "description": "AI-powered news literacy tool that helps you read between the lines.",
+  "name": "Read Between BETA",
+  "description": "AI-powered news literacy tool that helps you read between the lines. THIS EXTENSION IS FOR BETA TESTING",
   "version": "1.0.0",
   "background": {
     "service_worker": "background.bundle.js"
