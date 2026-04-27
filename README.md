@@ -1,7 +1,6 @@
-# Media Framing & Coverage Analyzer
+# Read Between
 
-
-A UX-driven Chrome extension that analyzes online news articles to surface framing patterns, source attribution, language signals, and alternative coverage perspectives.
+A Chrome extension that analyzes online news articles to surface framing patterns, source attribution, language signals, and alternative coverage perspectives.
 
 Built as a product-focused case study demonstrating UX strategy, information architecture, multi-stage AI pipeline design, and decision-making under technical constraints.
 
